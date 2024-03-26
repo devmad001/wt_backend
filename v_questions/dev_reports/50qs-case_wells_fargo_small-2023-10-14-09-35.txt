@@ -1,0 +1,159 @@
+[50Q Report for: case_wells_fargo_small ran on: 2023-10-14 09:35:48.113786
+1==================================================
+[question]: What is the Primary account number for bank statement? 
+[runtime]: 1.4679956436157227
+[answer]: The Primary account number for the bank statement is 1010083000401.
+[df]: Primary_Account_Number
+         1010083000401
+2==================================================
+[question]: What is the beginning monthly balance?  
+[runtime]: 2.2340445518493652
+[answer]: The beginning monthly balance is $4,012.
+[df]:  beginning_monthly_balance
+                   4011.86
+3==================================================
+[question]: What is the date the Account Opened? 
+[runtime]: 18.80477213859558
+[answer]: The date the account was opened is January 9, 2019.
+[df]: Account_Opened_Date
+         2019-01-09
+4==================================================
+[question]: What are the total deposits and additions?  
+[runtime]: 2.733154773712158
+[answer]: The total deposits and additions are $16,638.
+[df]:  total_deposits
+       16637.68
+5==================================================
+[question]: What is the total deposits and additions for the Month?  
+[runtime]: 6.7274370193481445
+[answer]: The total deposits and additions for the month is $16,638.
+[df]:  total_deposits_and_additions_for_the_month
+                                   16637.68
+6==================================================
+[question]: What is the total deposits and additions for the Year?  
+[runtime]: 3.415011167526245
+[answer]: The total deposits and additions for the year is $16,638.
+[df]:  total_deposits_and_additions_for_the_year
+                                  16637.68
+7==================================================
+[question]: What is the total deposits and additions for the Quarter? 
+[runtime]: 5.333660364151001
+[answer]: The total deposits and additions for the quarter is $16,638.
+[df]:  total_deposits_and_additions_for_quarter
+                                 16637.68
+8==================================================
+[question]: What is the total deposits and additions for the Day? 
+[runtime]: 5.2370665073394775
+[answer]: The total deposits and additions for the day is $16,638.
+[df]:  total_deposits_additions
+                 16637.68
+9==================================================
+[question]: What are the total deposits for the Month?  
+[runtime]: 6.255743503570557
+[answer]: The total deposits for the month of January is $0.
+[df]:  total_deposits_for_the_month
+                            0
+10==================================================
+[question]: What are the total deposits for the Year? 
+[runtime]: 6.837858200073242
+[answer]: The total deposits for the year 2021 are 0 US dollars.
+[df]:  Total_Deposits_Year_2021
+                        0
+11==================================================
+[question]: What are the total deposits for the Quarter? 
+[runtime]: 4.7155821323394775
+[answer]: The total deposits for the Quarter are $16,638.
+[df]:  total_deposits_quarter
+               16637.68
+12==================================================
+[question]: What are the total deposits for the Day?  
+[runtime]: 4.985441207885742
+[answer]: The total deposits for the day is $0.
+[df]:  total_deposits_for_the_day
+                          0
+13==================================================
+[question]: What are the total inflows? 
+[runtime]: 5.5672736167907715
+[answer]: The total inflows for the specified case are $16,638.
+[df]:  total_inflows
+      16637.68
+14==================================================
+[question]: What is the total number of outflows? (Defined as money going out, so leaving account)  
+[runtime]: 2.5986247062683105
+[answer]: The total number of outflows, defined as money going out of the account, is 41.
+[df]:  total_outflows
+             41
+15==================================================
+[question]: What is the total number of outflows via cash withdrawal? 
+[runtime]: 2.7505104541778564
+[answer]: The total number of outflows via cash withdrawal is 0.
+[df]:  total_cash_withdrawals
+                      0
+16==================================================
+[question]: What is the total number of outflows via check?  
+[runtime]: 5.545413255691528
+[answer]: The total number of outflows via check is 5.
+[df]:  total_outflows_via_check
+                        5
+17==================================================
+[question]: What is the total number of outflows via credit card payments? 
+[runtime]: 5.292857885360718
+[answer]: The total number of outflows via credit card payments is 0.
+[df]:  total_credit_card_outflows
+                          0
+18==================================================
+[question]: What is the total number of outflows via Zelle, and what is the ID number? 
+[runtime]: 3.8067595958709717
+[answer]: I'm sorry, but I don't have the information to answer your question.
+[df]: Empty DataFrame
+Columns: []
+Index: []
+19==================================================
+[question]: What is the total number of outflows via Wire? 
+[runtime]: 5.248866319656372
+[answer]: The total number of outflows via Wire is 0.
+[df]:  total_outflows_via_wire
+                       0
+20==================================================
+[question]: What is the total number of outflows via bank fees? 
+[runtime]: 4.966719627380371
+[answer]: The total number of outflows via bank fees is 0.
+[df]:  total_outflows_via_bank_fees
+                            0
+21==================================================
+[question]: What % of the withdrawals are ATM vs debit card? 
+[runtime]: 20.46881127357483
+[answer]: 12.2% of the withdrawals are made using a debit card, while 7.3% of the withdrawals are made at an ATM.
+[df]:  ATM_Withdrawals_Percentage  Debit_Card_Withdrawals_Percentage
+                   7.317073                          12.195122
+22==================================================
+[question]: How many electronic withdrawals occurred in total by day, month, year and quarter? 
+[runtime]: 11.294787406921387
+[answer]: In total, there were 3 electronic withdrawals that occurred on February 1, 2019 in the first quarter of that year.
+[df]:  Day  Year  Month  Quarter  Total_Withdrawals
+   1  2019      2        1                  3
+   4  2019      2        1                  2
+   7  2019      2        1                  4
+   9  2019      1        1                  1
+  10  2019      1        1                  1
+  11  2019      1        1                  1
+  14  2019      1        1                  1
+  15  2019      1        1                  3
+  16  2019      1        1                  2
+  17  2019      1        1                  3
+  18  2019      1        1                  1
+  24  2019      1        1                  2
+  28  2019      1        1                  1
+  31  2019      1        1                  2
+23==================================================
+[question]: How many electronic withdrawals occurred by Wire 
+[runtime]: 5.966221332550049
+[answer]: Based on the provided information, there were 0 electronic withdrawals that occurred by wire.
+[df]:  total_wire_withdrawals
+                      0
+24==================================================
+[question]: How many electronic withdrawals occurred by Zelle,  
+[runtime]: 6.506857395172119
+[answer]: There were 0 electronic withdrawals that occurred by Zelle.
+[df]:  electronic_withdrawals_by_Zelle
+                               0

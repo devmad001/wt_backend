@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"> <!-- Adding Inter Font -->
+    <style>
+        svg[class*="plot"] {
+            width-max: 100% !important;
+            /* override the width to 70% */
+            display: block;
+            /* make sure the SVG acts like a block-level element */
+            margin: 0 auto;
+            /* center the SVG block horizontally */
+            max-height: 100%; /* Ensures the SVG doesn't grow beyond its' container
+        }
+    </style>
+    
+    <style>
+        label {
+            font-family: "Inter", Sans-serif;
+        }
+    </style>
+
+
+    <title>Square</title>
+    <link rel="stylesheet" type="text/css" href="/static/inspector.css">
+    <script src="https://cdn.jsdelivr.net/npm/@graphcms/zoid@9.0.64-alpha.1/lib/zoid.js"></script>
+
+    <script>
+        // 0v1
+        const child_name = 'square'; // Define the child's name here
+
+        // Function to receive a message from another component (parent or child)
+        function receiveMessage(message) {
+            console.log(`Message received in ${child_name}:`, message);
+
+            const source = message.source || 'Unknown';
+            const key = message.key;
+            const value = message.value;
+
+            console.log(`Message received from ${source}.`);
+
+            // Handle action based on the key-value pair
+            switch (key) {
+                case 'change_background_color':
+                    if (value && value.color) {
+                        document.body.style.backgroundColor = value.color;
+                    }
+                    break;
+
+                case 'refresh_window_url':
+                    if (value && value.url) {
+                        window.location.href = value.url;
+                    }
+                    break;
+                case 'refresh_square':
+                    console.log("refreshing square!")
+                    loadSquare();
+                    break;
+
+                default:
+                    console.log("Unknown message key:", key);
+                    break;
+            }
+                
+
+
+            // Send acknowledgement back to the parent
+            sendMessageToParent('ack', 'Acknowledged');
+        }
+
+        // Function to send message to parent
+        function sendMessageToParent(key, value) {
+            if (window.xprops[`receiveParentMessageFrom_${child_name}`]) {
+                window.xprops[`receiveParentMessageFrom_${child_name}`]({
+                    source: child_name,
+                    key: key,
+                    value: value
+                });
+            }
+        }
+        
+        // Initialize function
+        function initialize() {
+            if (typeof window.xprops === 'undefined') {
+                console.error('window.xprops is undefined (or parent not found)');
+                return;
+            }
+
+            // Register the receiveMessage function
+            if (window.xprops.registerChildCallback) {
+                window.xprops.registerChildCallback(receiveMessage);
+            }
+
+            // Generalized function to send message to any child
+            window.sendMessageToChild = function(target_child_name, key, value) {
+                const message = {
+                    source: child_name, // use the generalized child_name
+                    key: key,
+                    value: value
+                };
+                window.xprops.relayMessageToChild(target_child_name, message);
+            };
+        }
+
+        window.addEventListener('DOMContentLoaded', initialize);
+
+        // Zoid configuration
+        zoid.create({
+            tag: `${child_name}-component`, // use the generalized child_name
+            props: {
+                relayMessageToChild: {
+                    type: 'function',
+                    required: false
+                },
+                registerChildCallback: {
+                    type: 'function',
+                    required: false
+                },
+                [`receiveParentMessageFrom_${child_name}`]: { // use the generalized child_name
+                    type: 'function',
+                    required: false
+                }
+            }
+        });
+    </script>
+    
+
+    <script type="module">
+        // Attach the loadSquare function to the window object to make it globally accessible.
+        window.loadSquare = function() {
+            // Clear the body content first.
+            document.body.innerHTML = 'Hello Im square';
+        }
+    </script>
+
+
+</head>
+<body>
+
+
+<script type="module">
+    // Load the square initially.
+    loadSquare();
+
+    // Wait for 5 seconds and load the plot again.
+    //setTimeout(() => { loadPlot(); }, 5000);
+
+</script>
+
+
+</body>
+</html>

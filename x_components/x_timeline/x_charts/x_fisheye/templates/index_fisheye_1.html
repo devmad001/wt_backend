@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>D3 Chart</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="/static/fisheye.js"></script>
+</head>
+<body>
+    <script>
+        // Your JavaScript code goes here
+
+var WorkforceData =    {
+  year: 2020,
+  months: [
+    {
+      month: 1,
+      openingHeadcount: 1105,
+      openingFTE: 0,
+      startingHires: 0,
+      startingFTE: 0,
+      hires: 23,
+      newHires: 22,
+      rehires: 1,
+      inPeriodHeadcount: 0,
+      distinctPeriodHeadcount: 0,
+      terminations: 18,
+      averageHeadcount: 1108.1935483870966,
+      fte: 1090.2701774193545,
+      endingFTE: 0,
+      endingTerminations: 2,
+      closingFTE: 0,
+      closingHeadcount: 1110
+    },
+    {
+      month: 2,
+      openingHeadcount: 1110,
+      openingFTE: 0,
+      startingHires: 1,
+      startingFTE: 0,
+      hires: 18,
+      newHires: 14,
+      rehires: 4,
+      inPeriodHeadcount: 0,
+      distinctPeriodHeadcount: 0,
+      terminations: 19,
+      averageHeadcount: 1113.4482758620695,
+      fte: 1095.128286206897,
+      endingFTE: 0,
+      endingTerminations: 1,
+      closingFTE: 0,
+      closingHeadcount: 1109
+    },
+    {
+      month: 3,
+      openingHeadcount: 1109,
+      openingFTE: 0,
+      startingHires: 0,
+      startingFTE: 0,
+      hires: 38,
+      newHires: 34,
+      rehires: 4,
+      inPeriodHeadcount: 0,
+      distinctPeriodHeadcount: 0,
+      terminations: 18,
+      averageHeadcount: 1121.967741935484,
+      fte: 1103.577693548387,
+      endingFTE: 0,
+      endingTerminations: 5,
+      closingFTE: 0,
+      closingHeadcount: 1129
+    },
+    {
+      month: 4,
+      openingHeadcount: 1129,
+      openingFTE: 0,
+      startingHires: 3,
+      startingFTE: 0,
+      hires: 22,
+      newHires: 22,
+      rehires: 0,
+      inPeriodHeadcount: 0,
+      distinctPeriodHeadcount: 0,
+      terminations: 22,
+      averageHeadcount: 1132.3999999999996,
+      fte: 1114.0404999999998,
+      endingFTE: 0,
+      endingTerminations: 5,
+      closingFTE: 0,
+      closingHeadcount: 1129
+    },
+    {
+      month: 5,
+      openingHeadcount: 1129,
+      openingFTE: 0,
+      startingHires: 1,
+      startingFTE: 0,
+      hires: 26,
+      newHires: 24,
+      rehires: 2,
+      inPeriodHeadcount: 0,
+      distinctPeriodHeadcount: 0,
+      terminations: 21,
+      averageHeadcount: 1134.7419354838717,
+      fte: 1114.941145161291,
+      endingFTE: 0,
+      endingTerminations: 2,
+      closingFTE: 0,
+      closingHeadcount: 1134
+    },
+    {
+      month: 6,
+      openingHeadcount: 1134,
+      openingFTE: 0,
+      startingHires: 17,
+      startingFTE: 0,
+      hires: 63,
+      newHires: 58,
+      rehires: 5,
+      inPeriodHeadcount: 0,
+      distinctPeriodHeadcount: 0,
+      terminations: 25,
+      averageHeadcount: 1160.333333333332,
+      fte: 1139.8760233333317,
+      endingFTE: 0,
+      endingTerminations: 4,
+      closingFTE: 0,
+      closingHeadcount: 1172
+    },
+    {
+      month: 7,
+      openingHeadcount: 1172,
+      openingFTE: 0,
+      startingHires: 2,
+      startingFTE: 0,
+      hires: 42,
+      newHires: 38,
+      rehires: 4,
+      inPeriodHeadcount: 0,
+      distinctPeriodHeadcount: 0,
+      terminations: 41,
+      averageHeadcount: 1175.5483870967737,
+      fte: 1155.5572387096768,
+      endingFTE: 0,
+      endingTerminations: 4,
+      closingFTE: 0,
+      closingHeadcount: 1173
+    },
+    {
+      month: 8,
+      openingHeadcount: 1173,
+      openingFTE: 0,
+      startingHires: 1,
+      startingFTE: 0,
+      hires: 37,
+      newHires: 32,
+      rehires: 5,
+      inPeriodHeadcount: 0,
+      distinctPeriodHeadcount: 0,
+      terminations: 34,
+      averageHeadcount: 1180.0967741935488,
+      fte: 1160.2840935483875,
+      endingFTE: 0,
+      endingTerminations: 0,
+      closingFTE: 0,
+      closingHeadcount: 1176
+    },
+    {
+      month: 9,
+      openingHeadcount: 1176,
+      openingFTE: 0,
+      startingHires: 16,
+      startingFTE: 0,
+      hires: 41,
+      newHires: 38,
+      rehires: 3,
+      inPeriodHeadcount: 0,
+      distinctPeriodHeadcount: 0,
+      terminations: 31,
+      averageHeadcount: 1189.5999999999995,
+      fte: 1170.280466666666,
+      endingFTE: 0,
+      endingTerminations: 6,
+      closingFTE: 0,
+      closingHeadcount: 1186
+    },
+    {
+      month: 10,
+      openingHeadcount: 1186,
+      openingFTE: 0,
+      startingHires: 4,
+      startingFTE: 0,
+      hires: 23,
+      newHires: 21,
+      rehires: 2,
+      inPeriodHeadcount: 0,
+      distinctPeriodHeadcount: 0,
+      terminations: 20,
+      averageHeadcount: 1190.0000000000002,
+      fte: 1170.4818612903225,
+      endingFTE: 0,
+      endingTerminations: 0,
+      closingFTE: 0,
+      closingHeadcount: 1189
+    },
+    {
+      month: 11,
+      openingHeadcount: 1189,
+      openingFTE: 0,
+      startingHires: 0,
+      startingFTE: 0,
+      hires: 45,
+      newHires: 44,
+      rehires: 1,
+      inPeriodHeadcount: 0,
+      distinctPeriodHeadcount: 0,
+      terminations: 21,
+      averageHeadcount: 1199.866666666667,
+      fte: 1180.5033666666668,
+      endingFTE: 0,
+      endingTerminations: 4,
+      closingFTE: 0,
+      closingHeadcount: 1213
+    },
+    {
+      month: 12,
+      openingHeadcount: 1213,
+      openingFTE: 0,
+      startingHires: 1,
+      startingFTE: 0,
+      hires: 13,
+      newHires: 13,
+      rehires: 0,
+      inPeriodHeadcount: 0,
+      distinctPeriodHeadcount: 0,
+      terminations: 15,
+      averageHeadcount: 1216.0645161290317,
+      fte: 1196.9270225806447,
+      endingFTE: 0,
+      endingTerminations: 6,
+      closingFTE: 0,
+      closingHeadcount: 1211
+    }
+  ]
+}
+
+function transformDataForD3(rawData) {
+  const transformedData = rawData.months.map((record, index) => {
+    return {
+      month: index + 1, // Assuming month starts from 1
+      openingHeadcount: record.openingHeadcount,
+      startingHires: record.startingHires,
+      hires: record.hires - record.startingHires,
+      averageHeadcount: record.averageHeadcount,
+      endingTerminations: record.endingTerminations * -1, // Multiplying by -1 as per your original logic
+      terminations: (record.terminations - record.endingTerminations) * -1,
+      closingHeadcount: index === 11 ? record.closingHeadcount * -1 : null // Handling for the last month
+    };
+  });
+
+  return transformedData;
+}
+
+const d3Data = transformDataForD3(WorkforceData);
+
+//        d3.csv("{{ data_url }}").then(function(data) {
+                
+  var margin = { top: 20, right: 20, bottom: 30, left: 40 },
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+        
+    
+
+      var xFisheye = d3.fisheye.scale(d3.scaleLinear).domain([0, width]).focus(360),
+      yFisheye = d3.scaleLinear().domain([0, height]); // Updated to scaleLinear
+
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var xScale = d3.scaleBand()
+    .rangeRound([0, width])
+    .padding(0.1)
+    .domain(d3Data.map(d => d.month));
+
+// normal y scale
+//var yScale = d3.scaleLinear()
+//    .range([height, 0])
+//    .domain([0, d3.max(d3Data, d => Math.max(d.hires, d.terminations, d.averageHeadcount))]);
+
+
+        // fancy y-scale
+var maxUpwardDeviation = d3.max(d3Data, d => d.averageHeadcount + d.hires);
+var maxDownwardDeviation = d3.min(d3Data, d => d.averageHeadcount - d.terminations);
+
+// Apply a 20% buffer
+var buffer = (maxUpwardDeviation - maxDownwardDeviation) * 0.2;
+var yScaleMax = maxUpwardDeviation + buffer;
+var yScaleMin = Math.max(0, maxDownwardDeviation - buffer); // Ensuring it doesn't go below 0
+        
+console.log('yScaleMin', yScaleMin);
+
+var yScale = d3.scaleLinear()
+    .range([height, 0])
+    .domain([yScaleMin, yScaleMax]);
+    
+        
+// Adjust the yScale domain to always include zero
+//var minY = d3.min(d3Data, d => Math.min(d.hires, d.terminations, d.averageHeadcount));
+//var maxY = d3.max(d3Data, d => Math.max(d.hires, d.terminations, d.averageHeadcount));
+//yScale.domain([Math.min(minY, 0), maxY]);
+
+
+        // Function to calculate the y position of each bar
+function calculateBarY(d, metric) {
+  if (metric === 'hires') {
+    return yScale(d.averageHeadcount)-calculateBarHeight(d, 'hires');
+  } else { // terminations
+    return yScale(d.averageHeadcount);
+  }
+}
+
+function calculateBarHeight(d, metric) {
+  if (metric === 'hires') {
+    // Height for hires
+    return Math.abs(yScale(d.averageHeadcount + d.hires) - yScale(d.averageHeadcount));
+  } else { // terminations
+    // Height for terminations
+    return Math.abs(yScale(d.averageHeadcount - d.terminations) - yScale(d.averageHeadcount));
+  }
+}
+
+
+      // Create bars for hires
+svg.selectAll(".bar-hires")
+    .data(d3Data)
+  .enter().append("rect")
+    .attr("class", "bar-hires")
+    .attr("x", d => xScale(d.month) + xScale.bandwidth() / 4)
+    .attr("y", d => calculateBarY(d, 'hires'))
+    .attr("width", xScale.bandwidth() / 2)
+    .attr("fill", "green")
+    .attr("height", d => calculateBarHeight(d, 'hires'));
+
+// Create bars for terminations
+svg.selectAll(".bar-terminations")
+    .data(d3Data)
+  .enter().append("rect")
+    .attr("class", "bar-terminations")
+    .attr("x", d => xScale(d.month) + xScale.bandwidth() / 4)
+    .attr("y", d => calculateBarY(d, 'terminations'))
+    .attr("width", xScale.bandwidth() / 2)
+    .attr("fill", "red")
+    .attr("height", d => calculateBarHeight(d, 'terminations'));
+
+
+var line = d3.line()
+    .x(d => xScale(d.month) + xScale.bandwidth() / 2) // Centering line in the middle of the band
+    .y(d => yScale(d.averageHeadcount));
+
+// Adding the line
+svg.append("path")
+    .datum(d3Data)
+    .attr("class", "line")
+    .attr("d", line)
+    .attr("fill", "none")
+    .attr("stroke", "steelblue")
+    .attr("stroke-width", 2);
+
+// Add the X Axis
+svg.append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(xScale));
+
+// Add the Y Axis
+svg.append("g")
+    .call(d3.axisLeft(yScale));
+    
+//end load        });
+      
+
+redraw();
+
+
+svg.on("mousemove", function() {
+  var mouse = d3.mouse(this);  // Using d3.mouse for D3 v5
+  xFisheye.focus(mouse[0]);
+  yFisheye.focus(mouse[1]);
+  redraw();
+});
+
+
+function redraw() {
+  // Update bars for hires
+  svg.selectAll(".bar-hires")
+    .attr("x", d => xFisheye(xScale(d.month)) + xFisheye(xScale.bandwidth()) / 4)
+    .attr("y", d => yFisheye(calculateBarY(d, 'hires')))
+    .attr("width", xFisheye(xScale.bandwidth()) / 2)
+    .attr("height", d => yFisheye(calculateBarHeight(d, 'hires')));
+
+  // Update bars for terminations
+  svg.selectAll(".bar-terminations")
+    .attr("x", d => xFisheye(xScale(d.month)) + xFisheye(xScale.bandwidth()) / 4)
+    .attr("y", d => yFisheye(calculateBarY(d, 'terminations')))
+    .attr("width", xFisheye(xScale.bandwidth()) / 2)
+    .attr("height", d => yFisheye(calculateBarHeight(d, 'terminations')));
+
+  // Update the line
+  svg.select(".line")
+    .attr("d", line);
+
+}
+    </script>
+</body>
+</html>
+
+

@@ -1,0 +1,101 @@
+#pydantic==1.8  #patch langchain for py 3.8
+langchain==0.0.287
+
+openai
+tiktoken
+
+pdfminer.six
+#3.0.0 requires lib update#  PyPDF2
+PyPDF2<3.0.0  #patch
+
+# NOT fiz
+# Name: PyMuPDF==1.20.2
+PyMuPDF==1.20.1    #fitz dpi
+
+## Trial pdf but can remove
+#high-level pdfminer# pdfplumber
+#python-opencv
+#ghostscript
+#camelot-py[base]
+
+# Watch may upgrade sqlalchemy to bad version??
+#camelot 12.6.29 requires SQLAlchemy<0.8.0,>=0.7.7, but you have sqlalchemy 2.0.23 which is incompatible.
+#JC REMOVED# camelot
+sqlalchemy==2.0.23
+
+## Required to build mysqlclient!
+#sudo apt-get install python3-dev default-libmysqlclient-dev build-essential
+#mysqlclient
+
+
+sqlitedict
+requests
+#py38# neo4j-5.12.0
+neo4j
+networkx
+python_cypher
+
+flask
+flask_cors
+
+uvicorn
+python-multipart
+
+bottle
+paste
+# Fix paste compatibility:
+pyopenssl
+cryptography
+
+psutil
+openpyxl
+
+ocrmypdf
+#    sudo apt-get update
+#    sudo apt-get -y install ocrmypdf python3-pip
+#    pip install --user --upgrade ocrmypdf
+#    """
+#
+#    ## WINDOWS:
+#    """
+#    powershell.exe   *may have already
+#    choco to test
+#    https://chocolatey.org/install
+#
+#    from powershell admin:
+#    choco install python3
+#    choco install --pre tesseract
+#    choco install ghostscript
+#    choco install pngquant (optional)
+
+
+streamlit==1.21.0  #1.27 maybe too new?
+streamlit_chat
+streamlit-feedback
+
+#apt install nginx
+gunicorn
+
+pretty-html-table
+
+boto3
+usaddress
+uvicorn[standard]    #For api_services web sockets
+
+## Azure
+azure-ai-formrecognizer
+
+## sudo apt install ghostscript
+
+scikit-learn
+matplotlib
+
+pytest
+pytest-asyncio
+starlette
+
+google-auth
+google-cloud-storage
+
+python-dateutil
+

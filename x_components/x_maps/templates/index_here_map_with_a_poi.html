@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Map with POIs</title>
+  <link href="https://unpkg.com/maplibre-gl@3.x/dist/maplibre-gl.css" rel="stylesheet" />
+  <style>
+    body { margin: 0; }
+    #map { height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script src="https://unpkg.com/maplibre-gl@3.x/dist/maplibre-gl.js"></script>
+  <script>
+    const apiKey = "YOUR_API_KEY";
+    const mapName = "YOUR_MAP_NAME";
+    const region = "YOUR_AWS_REGION";
+
+    // Define your Points of Interest (POIs)
+    const poiData = {
+      'type': 'FeatureCollection',
+      'features': [
+        {
+          'type': 'Feature',
+          'geometry': {
+            'type': 'Point',
+            'coordinates': [-123.115898, 49.295868] // Insert your POI's longitude and latitude
+          },
+          'properties': {
+            'title': 'POI 1', // Title of your POI
+            'description': 'Description for POI 1' // Description of your POI
+          }
+        },
+        // Add more POIs as needed
+      ]
+    };
+
+    // Initialize the map
+    const map = new maplibregl.Map({
+      container: "map",
+      style: `https://maps.geo.${region}.amazonaws.com/maps/v0/maps/${mapName}/style-descriptor?key=${apiKey}`,
+      center: [-123.115898, 49.295868],
+      zoom: 11,
+    });
+
+    // Add navigation control
+    map.addControl(new maplibregl.NavigationControl(), "top-left");
+
+    // Add POIs when the map is loaded
+    map.on('load', function () {
+      // Add a data source for POIs
+      map.addSource('pois', {
+        type: 'geojson',
+        data: poiData
+      });
+      
+      // Add a new layer to visualize the POIs
+      map.addLayer({
+        id: 'pois',
+        type: 'circle',
+        source: 'pois',
+        paint: {
+          'circle-color': '#11b4da',
+          'circle-radius': 10,
+          'circle-stroke-width': 1,
+          'circle-stroke-color': '#fff'
+        }
+      });
+    });
+  </script>
+</body>
+</html>

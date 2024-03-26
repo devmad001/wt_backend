@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en" style="overflow: hidden">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Timeline</title>
+    <style>
+        svg text {
+            transition: fill-opacity 0.25s ease-out;
+            font-family: "Inter", sans-serif;
+        }
+
+        svg:hover text {
+            fill-opacity: 1;
+        }
+
+        svg {
+            cursor: grab;
+        }
+
+        svg:active {
+            cursor: grabbing;
+        }
+
+        text {
+            font-family: "Inter", sans-serif;
+        }
+
+        .tooltip {
+            position: absolute;
+            text-align: center;
+            width: auto;
+            height: auto;
+            padding: 2px;
+            font: 12px sans-serif;
+            background: white;
+            border: 0px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 8px -4px rgba(16, 24, 40, 0.03), 0px 0px 24px -4px rgba(16, 24, 40, 0.08);
+            pointer-events: none;
+            transition: opacity 0.2s;
+            padding: 10px 12px;
+        }
+
+        .tooltip p {
+            padding: 4px 0px;
+            margin: 0px;
+            border-bottom: solid 1px #EEF1F5;
+            color: #263E70;
+            font-weight: 600;
+            font-size: 10px;
+            display: flex;
+            line-height: 0.9rem;
+        }
+
+        .tooltip p:last-child {
+            border-bottom: 0px;
+            padding-bottom: 0px;
+        }
+
+        .tooltip span {
+            color: #6078A9;
+            min-width: 68px;
+        }
+
+        .tooltip img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            min-width: 250px;
+        }
+
+        body {
+            margin: 0;
+        }
+    </style>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://d3js.org/d3-force.v2.min.js"></script>
+</head>
+
+<body>
+    <script>
+        // 0v3  JC  Feb 20, 2024   v3 speed adjustments
+        //   [A]    maxIterations = 75;  // was 150. 50 is bit clumpy. 75 decent, 100 slightly better.
+        //   [B]    let fontSize = Math.min(10, circleRadius * 0.50); // v3 0.50 <-- 0.60 has some against edge
+
+        // 0v2  JC  Jan  5, 2024   Basic style changes (text to white, horizontal lines)
+        // **ahead of fisheye zoom v2
+
+
+        var chartWidth = {{ maxWidth | default (1200, true) }};
+        var chartHeight = {{ maxHeight | default (1000, true) }};
+
+        // D3 controlled max height (proportional?)
+        if (chartHeight > chartWidth) {
+            chartHeight = chartWidth;
+        }
+
+        console.log("[D3] Timeline chartWidth: " + chartWidth + " chartHeight: " + chartHeight);
+
+        var chartPad = 50;
+
+        // Unused below but perhaps
+        var chartPadTop = 50;
+        var chartPadRight = 50;
+        var chartPadBottom = 50;
+        var chartPadLeft = 50;
+
+        let maxRadiusFixed = 20; // Will be set to 20 or 80 depending on data length
+
+        const startTime = new Date(); // v3
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // Fetch data from the new endpoint
+            let timePreloadStart = new Date();
+            d3.json('{{ data_url }}').then(function (response) {
+                let data = response.records;
+
+                console.log("[D3] Data load time: " + (new Date() - timePreloadStart) + "ms record count: " + data.length);
+
+                let timeD3Start = new Date();
+
+                // Filter the data to exclude records with transaction_amount as 0 or blank
+                data = data.filter(d => {
+                    return d.transaction_amount !== 0 && d.transaction_amount !== "";
+                });
+
+                // Transform the data
+                data.forEach(d => {
+                    d.transaction_date = new Date(d.transaction_date);
+                    d.transaction_amount = +d.transaction_amount;
+                });
+
+                // Create scales
+                // default max circle radius depending on count of nodes
+                if (data.length > 12) {
+                    maxRadiusFixed = 20;
+                } else {
+                    maxRadiusFixed = 40;
+                }
+
+                chartPad = Math.max(maxRadiusFixed, chartPad);
+
+
+                const rScale = d3.scaleSqrt()
+                    .domain([0, d3.max(data, d => d.transaction_amount)])
+                    .range([2, maxRadiusFixed]);
+
+                // Update dataset with random +/-1 values (if necessary)
+                data = data.map(dataPoint => {
+                    if (dataPoint.value === undefined) {
+                        return {
+                            ...dataPoint,
+                            value: Math.random() > 0.5 ? 1 : -1
+                        };
+                    } else {
+                        return dataPoint;
+                    }
+                });
+
+                const xExtent = d3.extent(data, d => d.transaction_date);
+                const xScale = d3.scaleTime()
+                    .domain(xExtent)
+                    .range([chartPad, chartWidth - chartPad]);
+
+                const xAxis = d3.axisBottom(xScale);
+
+                function priority(d) {
+                    return -d.transaction_amount;
+                }
+
+                function customRadiusScale(transaction_amount) {
+                    return Math.min(rScale(transaction_amount), maxRadiusFixed);
+                }
+
+                // CALL SWARM PLACEMENT OF CIRCLES
+                const {
+                    circles,
+                    xAxisPosition
+                } = swarm(
+                    data,
+                    d => xScale(d.transaction_date),
+                    d => customRadiusScale(d.transaction_amount),
+                    priority
+                );
+
+                const svg = d3.select('body').append('svg')
+                    .attr('width', chartWidth)
+                    .attr('height', chartHeight)
+                    .style('cursor', 'crosshair');
+
+
+                console.log("[D3] xAxisPosition: " + xAxisPosition);
+                xAxisGroup = svg.append("g")
+                    .attr("transform", `translate(0, ${xAxisPosition})`)
+                    .call(xAxis)
+                    // fill color grey
+                    //.style("fill", "grey")
+                    .attr("class", "x-axis")
+                    .call((g) => g.selectAll("path").attr("stroke", "#BDC9E2"))
+                    .call((g) => g.selectAll(".tick line").attr("stroke", "#BDC9E2"))
+                    .selectAll("text")
+                    .attr('font-size', 10)
+                    .attr('font-weight', 600)
+                    .attr("fill", "#6078A9");
+
+                // Change the x-axis line color to grey
+                xAxisGroup.select('.domain') // '.domain' selects the axis line
+                    .style('stroke', 'grey'); // Set the stroke color to grey
+
+
+                // Optional style yAxis horizontal lines
+                const yExtent = d3.extent(data, d => d.transaction_amount); // Adjust according to your data
+                const yScale = d3.scaleLinear()
+                    .domain(yExtent)
+                    .range([chartHeight - chartPad, chartPad]); // Invert range for y-axis
+
+                // Optional: Create Y-Axis
+                const yAxis = d3.axisLeft(yScale);
+
+                // Add horizontal grid lines
+                svg.selectAll(".grid-line")
+                    .data(yScale.ticks()) // Use the yScale's ticks
+                    .enter().append("line")
+                    .attr("class", "grid-line")
+                    .attr("x1", chartPad)
+                    .attr("x2", chartWidth - chartPad)
+                    .attr("y1", d => yScale(d))
+                    .attr("y2", d => yScale(d))
+                    .attr("stroke", "#B4C4DD") // Light grey color for the grid lines
+                    .attr("stroke-width", 1)
+                    .style("stroke-dasharray", ("3, 3")) // Creates a pattern of 3px dash, 3px gap
+                    ; // Adjust opacity for faintness
+
+
+
+
+                // Conditionally hide the xAxis if there are no data points
+                if (data.length === 0) {
+                    xAxisGroup.style('visibility', 'hidden');
+                } else {
+                    xAxisGroup.style('visibility', 'visible');
+                }
+
+                const circlesGroup = svg.append("g")
+                    .attr("class", "circles");
+
+                const greenGradient = svg
+                    .append("svg:defs")
+                    .append("svg:linearGradient")
+                    .attr("id", "greenGradient")
+                    .attr("x1", "0%")
+                    .attr("y1", "0%")
+                    .attr("x2", "100%")
+                    .attr("y2", "100%")
+                    .attr("spreadMethod", "pad");
+
+                greenGradient
+                    .append("svg:stop")
+                    .attr("offset", "0%")
+                    .attr("stop-color", "#31E4A4")
+                    .attr("stop-opacity", 1);
+
+                greenGradient
+                    .append("svg:stop")
+                    .attr("offset", "100%")
+                    .attr("stop-color", "#02C087")
+                    .attr("stop-opacity", 1);
+
+                const redGradient = svg
+                    .append("svg:defs")
+                    .append("svg:linearGradient")
+                    .attr("id", "redGradient")
+                    .attr("x1", "0%")
+                    .attr("y1", "0%")
+                    .attr("x2", "100%")
+                    .attr("y2", "100%")
+                    .attr("spreadMethod", "pad");
+
+                redGradient
+                    .append("svg:stop")
+                    .attr("offset", "0%")
+                    .attr("stop-color", "#FF4D4F")
+                    .attr("stop-opacity", 1);
+
+                redGradient
+                    .append("svg:stop")
+                    .attr("offset", "100%")
+                    .attr("stop-color", "#FF7374")
+                    .attr("stop-opacity", 1);
+
+                const circlesSelection = circlesGroup.selectAll('circle')
+                    .data(circles)
+                    .enter().append('circle')
+                    .style('cursor', 'crosshair')
+                    .attr('cx', d => d.x)
+                    .attr('cy', d => chartHeight / 2 - d.y)
+                    .attr('r', d => d.r)
+                    .attr('fill', d => d.datum.value === 1 ? "url(#greenGradient)" : "url(#redGradient)");
+
+                // Axis
+                svg
+                    .append("text")
+                    .attr("text-anchor", "end")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", 25)
+                    .attr("x", - chartHeight / 4 - chartHeight / 15)
+                    .attr("fill", "#02C087")
+                    .attr("font-weight", 600)
+                    .text("Incoming >");
+                // Axis
+                svg
+                    .append("text")
+                    .attr("text-anchor", "end")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", 25)
+                    .attr("x", - chartHeight / 4 * 3 + chartHeight / 10)
+                    .attr("fill", "#FF4D4F")
+                    .attr("font-weight", 600)
+                    .text("< Outgoing");
+
+
+                // ##############################################
+                // #  WORD WRAP FUNCTION
+                // ##############################################
+
+                // Function to wrap text within circles
+
+                // Function to adjust font size
+                function adjustFontSize(textElement, circleRadius) {
+                    // let fontSize = Math.min(10, circleRadius * 0.60);
+                    let fontSize = Math.min(10, circleRadius * 0.50); // v3 0.50 <-- 0.60 has some against edge
+                    textElement.style("font-size", `${fontSize}px`);
+                    return fontSize; // Return the adjusted font size
+                }
+
+                // Function to wrap text within circles, considering the vertical space
+                function wrapText(textElement, text, x, startY, lineHeight, circleRadius, circleBottomY) {
+                    const words = text.split(/\s+/);
+                    const LAST_LINE_BUFFER = 5; // Pixels to add to the bottom of the last line (helps with clipping)
+                    let line = [];
+                    let currentHeight = startY; // Start at the initial Y position
+                    let tspan = textElement.append("tspan")
+                        .attr("x", x)
+                        .attr("dy", `${startY}em`);
+
+                    words.forEach(function (word) {
+                        line.push(word);
+                        tspan.text(line.join(" "));
+                        const node = tspan.node();
+                        const textWidth = node.getComputedTextLength();
+
+                        if (textWidth > circleRadius * 2) {
+                            line.pop();
+                            tspan.text(line.join(" "));
+                            line = [word];
+                            currentHeight += lineHeight;
+
+                            let textBottomY = textElement.node().getBBox().y + textElement.node().getBBox().height;
+                            textBottomY += LAST_LINE_BUFFER; // Add buffer to the bottom of the last line
+
+                            if (textBottomY > circleBottomY) {
+                                tspan.remove(); // Remove only this tspan if it doesn't fit
+                                return;
+                            }
+
+                            tspan = textElement.append("tspan")
+                                .attr("x", x)
+                                .attr("dy", `${lineHeight}em`)
+                                .text(word);
+                        }
+                    });
+                }
+
+
+                // Existing code to create text elements
+                const textSelection = circlesGroup.selectAll('text')
+                    .data(circles)
+                    .enter()
+                    .append('text')
+                    .attr('x', d => d.x)
+                    .attr('y', d => chartHeight / 2 - d.y)
+                    // .attr('y', d => y(d.value))
+                    .attr('text-anchor', 'middle')
+                    .style('pointer-events', 'none')
+                    // Stroke to white  **beware, changes to higher weight
+                    // font-family: "Inter", sans-serif;   **on FE
+                    // RECALL:  stroke is outline .style('stroke', 'black')
+                    .style('fill', 'white')
+                    .style('font-weight', '700')
+                    // bold .style('font-weight', 'bold')
+
+                    .each(function (d) {
+                        const textElement = d3.select(this);
+                        const fontSize = adjustFontSize(textElement, d.r);
+                        let lineHeight = fontSize * 1.2;
+
+                        // Append transaction amount
+                        textElement.append('tspan')
+                            .attr('x', d.x)
+                            .text(Math.round(d.datum.transaction_amount).toLocaleString());
+
+                        // Adjust Y-coordinate for section text
+                        let currentDY = lineHeight / fontSize;
+
+                        if (d.r > 30) {
+                            // Calculate the bottom boundary of the circle
+                            let circleBottomY = (chartHeight / 2 - d.y) + d.r;
+
+                            // Wrap the section text
+                            const sectionText = d.datum.section;
+                            wrapText(textElement, sectionText, d.x, currentDY, lineHeight / fontSize, d.r, circleBottomY);
+                        }
+                    });
+
+                // Tool tip
+                const tooltip = d3.select("body").append("div")
+                    .attr("class", "tooltip")
+                    .style("opacity", 0);
+
+                function onMouseOver(d) {
+                    // Access the current event and the current DOM element
+                    const event = d3.event;
+
+                    // Calculate the offsets based on the circle's radius
+                    const radius = d.r;
+                    let xOffset = radius + 20; // Horizontal offset from the circle
+                    let yOffset = 10; // Vertical offset from the cursor
+
+                    // MAKE CIRCLE MORE VISIBLE
+                    let circle = d3.select(this);
+                    //circle.style('stroke', 'black')
+                    circle.style('stroke', '#B4C4DD')
+                        .style('stroke-width', '2px');
+
+                    // Configure and show the tooltip
+                    tooltip.html(`<div style='text-align: left;${!!d.datum?.check_url?.length ? "max-width: 400px;" : "max-width: 250px;"}'>` +
+                        "<p><span>Amount:</span> $" + parseFloat(d.datum.transaction_amount).toFixed(2) + "</p>" +
+                        "<p><span>Section:</span> " + d.datum.section + "</p>" +
+                        "<p><span>Date:</span> " + new Date(d.datum.transaction_date).toISOString().split('T')[0] + "</p>" +
+                        "<p><span>Description:</span> " + d.datum.transaction_description + "</p>" +
+                        `${!!d.datum?.check_url?.length ? `<img src="${d.datum?.check_url?.replace(" ", "%20")}" />` : ""}` +
+                        "</div>")
+
+                    // Get tooltip dimensions
+                    let tooltipWidth = tooltip.node().getBoundingClientRect().width;
+                    let tooltipHeight = tooltip.node().getBoundingClientRect().height;
+
+                    // Check if the tooltip will go beyond the right edge of the screen
+                    if (event.pageX + xOffset + tooltipWidth > window.innerWidth) {
+                        // Place it to the left of the cursor
+                        xOffset = -(xOffset + tooltipWidth);
+                    }
+
+                    // Adjust yOffset so it does not cover the circle
+                    if (event.pageY - yOffset - tooltipHeight < 0) {
+                        // Tooltip goes above the top edge, align it with the top
+                        yOffset = -event.pageY + tooltipHeight + 5;
+                    } else if (event.pageY + yOffset > window.innerHeight) {
+                        // Tooltip goes beyond the bottom edge, move it above the cursor
+                        yOffset = -tooltipHeight - 5;
+                    }
+
+                    // Apply the adjusted positions
+                    tooltip.style("left", (event.pageX + xOffset) + "px")
+                        .style("top", (event.pageY - yOffset) + "px");
+
+                    // Show the tooltip
+                    tooltip.transition()
+                        .duration(50)
+                        .style("opacity", 1);
+                }
+
+                function onMouseOut() {
+                    // Remove the border from the circle
+                    const circle = d3.select(this); // 'this' refers to the SVG circle element
+                    circle.style('stroke', null)
+                        .style('stroke-width', null);
+
+                    // Hide the tooltip
+                    tooltip.transition()
+                        .duration(500)
+                        .style("opacity", 0);
+                }
+
+
+                function onMouseClick(d) {
+                    const url = d.locate; // Data attributes need to be mapped (in circle above!)
+                    //                    console.log("Click: "+url);
+                    //                    const dd = d3.select(this).datum();
+                    //                     console.log("Data bound to clicked circle:", dd);
+                    //                     console.log("Data bound to clicked circle:", dd.locate);
+
+                    if (url) {
+                        window.open(url, '_blank').focus();
+                    }
+                }
+
+
+                circlesSelection.on("mouseover", onMouseOver)
+                    .on("mouseout", onMouseOut);
+
+                circlesSelection.on("click", onMouseClick);
+
+
+                // Define Zoom Behavior
+                const zoom = d3.zoom()
+                    //                    .filter(event => event.type !== "click")   // ignore clicks but causes undefined?
+                    .scaleExtent([1, 10])
+                    .translateExtent([
+                        [0, 0],
+                        [chartWidth, chartHeight]
+                    ])
+                    .on("zoom", zoomed);
+
+                // Apply Zoom Behavior to the SVG
+                //NO ZOOM                svg.call(zoom);
+
+                // Initialize a transform representing the current zoom state
+                let currentTransform = d3.zoomIdentity;
+
+                // Function to handle zooming
+                function zoomByKey(factor) {
+                    // Adjust the scale
+                    currentTransform = currentTransform.scale(factor);
+
+                    // Clamp the scale to the allowed range
+                    currentTransform.k = Math.max(zoom.scaleExtent()[0], Math.min(zoom.scaleExtent()[1], currentTransform.k));
+
+                    // Update the chart
+                    updateChart();
+                }
+
+                // UPDATE
+                function updateChart() {
+                    // Apply the current transform to the x-scale
+                    const newXScale = currentTransform.rescaleX(xScale);
+
+                    // Update the x-axis
+                    svg.select(".x-axis").call(xAxis.scale(newXScale));
+
+                    // Update the position and size of the circles
+                    circlesSelection.attr('cx', d => newXScale(d.datum.transaction_date));
+                    // FIX SCALE otherwise will overlap                        .attr('r', d => currentTransform.k * customRadiusScale(d.datum.transaction_amount));
+
+                    // Update the position and size of the text labels
+                    textSelection.attr('x', d => newXScale(d.datum.transaction_date))
+                        .style('font-size', `${Math.max(14, currentTransform.k)}px`) // Minimum font size of 14px
+                        .style('display', function (d) {
+                            return currentTransform.k * customRadiusScale(d.datum.transaction_amount) < 10 ? 'none' : null;
+                        });
+
+                    // Update the position and line break of tspan elements
+                    textSelection.selectAll('tspan')
+                        .attr('x', d => newXScale(d.datum.transaction_date))
+                        .attr('dy', function (d, i) {
+                            // Check if the 'y' attribute is set, and adjust 'dy' accordingly
+                            const y = d3.select(this).attr('y');
+                            if (y) {
+                                return i === 0 ? (parseFloat(y) - d.y) + 'em' : '1.2em';
+                            } else {
+                                return i === 0 ? ".35em" : '1.2em';
+                            }
+                        });
+                }
+
+                function zoomed() {
+                    currentTransform = d3.event.transform;
+                    updateChart();
+                }
+
+                // Add keyboard event listeners for zooming
+                d3.select('body').on('keydown', function () {
+                    if (d3.event.key === '+') {
+                        zoomByKey(1.1); // Zoom in
+                    } else if (d3.event.key === '-') {
+                        zoomByKey(0.9); // Zoom out
+                    }
+                });
+
+                        
+                let total_time= new Date() - startTime;
+                let misc_rate=total_time/(data.length)*1000;
+                console.log("Total time: "+total_time+"ms  (at "+misc_rate.toFixed(0)+"ms per 1000 node)");
+
+            });
+
+        }); // End of DOMContentLoaded event listener
+
+
+        /* PERF OPTIONS TO TRY:
+            (1)  Estimate overlap and adjust only if significant
+                 let overlapDistance = requiredDistance - distance;
+                        let overlapRatio = overlapDistance / requiredDistance;
+        
+                        // Use a threshold to decide if the overlap is significant enough to adjust
+                        if (overlapRatio > yourOverlapThreshold) { // Define `yourOverlapThreshold` based on your needs
+                            let adjustY = overlapDistance / 2;
+        */
+        function validateAndAdjust(circles) {
+            // works once focus on smaller ones
+
+            // maxIterations
+            //  - Recall max_terations x O(n^2)  1000 x 1000 = 1,000,000
+            //; Raw force steps. tbd on ideal
+            // maxIterations = 200; // 6s looks like 1000 same gets tall
+            // maxIterations = 150; // Standard!
+            // maxIterations = 100; // 4s
+            // maxIterations = 75;  // 4.0, 4.2, 4.0, Not bad but some clumpy? about like 50 slightly better
+            // maxIterations = 50;  // Not bad but some clumpy?
+            // maxIterations = 25;  // 25 too low
+            // maxIterations = 10; // Too clumpy
+            let maxIterations = 50;  // Not bad but some clumpy?
+
+            let iterations = 0;
+            let adjusted = false; // Flag to check if any adjustments have been made in the current iteration
+
+            do {
+                adjusted = false; // Reset the flag at the beginning of each iteration
+
+                for (let i = 0; i < circles.length; i++) {
+                    for (let j = i + 1; j < circles.length; j++) {
+                        let circleA = circles[i];
+                        let circleB = circles[j];
+                        let dx = circleA.x - circleB.x;
+                        let dy = circleA.y - circleB.y;
+
+                        // Use squared distances to avoid the costly square root operation
+                        let distanceSquared = dx * dx + dy * dy;
+                        let requiredDistance = circleA.r + circleB.r;
+                        let requiredDistanceSquared = requiredDistance * requiredDistance;
+
+                        // Check for overlap using squared distances
+                        if (distanceSquared < requiredDistanceSquared) {
+                            let distance = Math.sqrt(distanceSquared); // Only compute the square root when necessary
+                            let overlap = requiredDistance - distance;
+                            let adjustY = overlap / 2;
+
+                            // Adjust the circles based on their radius and position
+                            if (circleA.r > circleB.r) {
+                                adjustCircle(circleB, adjustY, chartHeight, chartPad);
+                            } else {
+                                adjustCircle(circleA, adjustY, chartHeight, chartPad);
+                            }
+
+                            // Perform absolute checks to ensure circles remain within bounds
+                            enforceBounds(circleA, chartHeight, chartPad);
+                            enforceBounds(circleB, chartHeight, chartPad);
+
+                            adjusted = true; // Mark that an adjustment has been made
+                        }
+                    }
+                }
+                iterations++; // Increment the iteration counter
+            } while (adjusted && iterations < maxIterations); // Continue until no adjustments are made or the max iterations are reached
+
+
+            if (iterations >= maxIterations) {
+                //always console.info("[info]  Max iterations reached, there might still be overlaps");
+            }
+
+            // Function to adjust circle position based on overlap and chart bounds
+            function adjustCircle(circle, adjustY, chartHeight, chartPad) {
+                if (circle.y > 0) {
+                    circle.y = Math.min(chartHeight / 2 - chartPad, circle.y + adjustY);
+                } else {
+                    circle.y = Math.max(-(chartHeight / 2 - chartPad), circle.y - adjustY);
+                }
+            }
+
+            // Function to enforce the circle's position remains within the chart bounds
+            function enforceBounds(circle, chartHeight, chartPad) {
+                let topBound = -(chartHeight / 2 - chartPad);
+                let bottomBound = chartHeight / 2 - chartPad;
+
+                if (circle.y > 0 && (circle.y + circle.r) > bottomBound) {
+                    circle.y = bottomBound - circle.r;
+                } else if (circle.y < 0 && (Math.abs(circle.y) + circle.r) > Math.abs(topBound)) {
+                    circle.y = topBound + circle.r;
+                }
+            }
+
+        } // End of validateAndAdjust function
+
+
+
+        // PLACE + ARRANGE CIRCLE NODES
+        function swarm(data, x, r, priority) {
+            console.log("[D3] Start swarm circle placement...");
+            let timeSwarmStart = new Date();
+
+            let circles = data
+                .map((d, index) => ({
+                    datum: d,
+                    x: x(d),
+                    y: Infinity,
+                    r: r(d),
+                    priority: priority(d),
+                    index,
+                    value: d.value,
+                    locate: d.locate
+                }))
+                .sort((a, b) => d3.ascending(a.x, b.x));
+            //            console.log("CIRCLES: ",circles);
+
+            let maxRadius = d3.max(circles, d => d.r);
+            let positiveCircles = circles.filter(d => d.value === 1);
+            let negativeCircles = circles.filter(d => d.value === -1);
+            console.log("[D3] Max radius at swarm: " + maxRadius);
+
+
+            function placeCircles(group, direction) {
+                let indices = d3.range(group.length)
+                    .sort((a, b) => d3.ascending(group[a].priority, group[b].priority));
+                indices.forEach((index, order) => (group[index].order = order));
+
+                let baseOfStack = new Array(group.length).fill(null);
+
+                // First pass: calculate y positions and base of stack
+                for (let index of indices) {
+                    let intervals = [];
+                    let circle = group[index];
+                    for (let step of [-1, 1])
+                        for (let i = index + step; i > -1 && i < group.length; i += step) {
+                            let other = group[i];
+                            let dist = Math.abs(circle.x - other.x);
+                            let radiusSum = circle.r + other.r;
+                            if (dist > circle.r + Math.max(circle.r, other.r)) break;
+                            if (other.y === Infinity || dist > radiusSum) continue;
+                            let offset = Math.sqrt(radiusSum * radiusSum - dist * dist);
+                            intervals.push([other.y - offset, other.y + offset]);
+                            // Calculate base of the stack
+                            if (baseOfStack[i] !== null) {
+                                baseOfStack[index] = baseOfStack[i];
+                            }
+                        }
+                    let y = 0;
+                    if (intervals.length) {
+                        intervals.sort((a, b) => d3.ascending(a[0], b[0]));
+                        let candidate = 0;
+                        for (let [lo, hi] of intervals) {
+                            if (direction > 0 && candidate + circle.r + 1 <= lo) break;
+                            if (direction < 0 && candidate - (circle.r + 1) >= hi) break;
+                            if (direction > 0 && hi >= 0) candidate = hi + 1;
+                            if (direction < 0 && lo <= 0) candidate = lo - 1;
+                        }
+                        y = candidate;
+                    }
+                    group[index].y = y;
+                    if (baseOfStack[index] === null) {
+                        baseOfStack[index] = index; // If the circle is not part of any stack, it is its own base
+                    }
+                }
+
+                // If maxRadiusCircle is undefined, use maxRadiusFixed
+                let maxRadiusCircle = group.find(circle => circle.r === d3.max(group, d => d.r));
+                let referenceLineYOffset = maxRadiusCircle ? maxRadiusCircle.r : maxRadiusFixed;
+
+                console.log("[D3] max radius> " + referenceLineYOffset);
+
+
+                // Second pass: adjust y positions for edge alignment
+                if (direction > 0) { // For the top stack
+                    let adjustment = maxRadius;
+                    if (group.length) {
+                        let adjustment = maxRadius - group[0].r; // Calculate the adjustment based on the largest and bottom-most circles
+
+                    }
+
+                    for (let i = 0; i < group.length; i++) {
+                        let circle = group[i];
+                        let baseCircle = group[baseOfStack[i]];
+                        circle.y += adjustment; // Apply the adjustment to align the bottom edges
+                        // shift circles towards the reference line (gravity)
+                        circle.y = circle.y - referenceLineYOffset + baseCircle.r;
+                    }
+                } else { // For the bottom stack
+                    let adjustment = maxRadius;
+                    if (group.length) {
+                        let adjustment = maxRadius - group[group.length - 1].r; // Calculate the adjustment based on the largest and bottom-most circles
+
+                    }
+                    for (let i = 0; i < group.length; i++) {
+                        let circle = group[i];
+                        let baseCircle = group[baseOfStack[i]];
+                        circle.y -= adjustment; // Apply the adjustment to align the top edges
+                        circle.y = circle.y + referenceLineYOffset - baseCircle.r;
+                    }
+                }
+
+                // GAP: Adjust y positions to include the gap (along x-axis)
+
+                // maxRadiusFixed at 80 default
+                let gap = maxRadius * 0.40; // + 6;
+                if (direction > 0) {
+                    // let gap = maxRadius;// + 3;  // UPPER GAP
+                    gap = Math.max(maxRadius, 12);
+
+                    // Also put upper limit on gap size
+                    gap = Math.min(gap, 30)
+                } else {
+                    // let gap = maxRadius - 10;// + 18;
+                    gap = Math.max(maxRadius - 10, 12);
+                    // Also put upper limit on gap size
+                    gap = Math.min(gap, 30)
+                }
+
+                for (let circle of group) {
+                    circle.y += direction * gap;
+                }
+                console.log("[D3] Direction: " + direction + " gap: " + gap);
+
+                return gap;
+            }
+
+            // Performance option
+            // in iframe, firefox: 9, chrome: 1
+            // No iframe, chrome: 14
+            function estimateCyclesPerMinute() {
+                let count = 0;
+                const startTimeInner = performance.now();
+                const targetDuration = 1000; // Target duration in milliseconds (1 second)
+
+                // Perform calculations until approximately 1 second has passed
+                while (performance.now() - startTimeInner < targetDuration) {
+                    // Simulated workload (can be adjusted as needed)
+                    Math.sqrt(Math.random() * (count + 1));
+
+                    count++;
+                }
+
+                const endTime = performance.now();
+                const actualDuration = endTime - startTimeInner;
+                console.log(`Actual duration: ${actualDuration} milliseconds`);
+                //    console.log(`Iterations in 1 second: ${count}`);
+
+                // Extrapolate to estimate metga cycles per minute
+                const cyclesPerMinute = count / 1000000;
+                console.log(`Estimated mega cycles per second: ${cyclesPerMinute}`);
+            }
+            //            estimateCyclesPerMinute();
+
+
+            // Placement is fast
+            let gapup = placeCircles(positiveCircles, 1);
+            let gapdown = placeCircles(negativeCircles, -1);
+
+            let result = positiveCircles.concat(negativeCircles);
+
+            result.sort((a, b) => d3.ascending(a.index, b.index));
+
+//            console.log("[D3] Starting validateAndAdjust overall timer at: " + (new Date() - startTime) + "ms")
+
+            let timeValidateStart = new Date();
+            validateAndAdjust(result);
+            console.log("[D3] Time spent in validateAndAdjust: " + (new Date() - timeValidateStart) + "ms");
+            
+//            let totalTime = new Date() - startTIme;
+//            let misc_rat=totalTime/(data.length)*1000;
+
+//            console.log("[D3] Done adjust overall timer at: " + (new Date() - startTime) + "ms 'rate': "+misc_rate+"ms per 1000 nodes")
+
+            // NOTE:  Positive and negative circle defs changed?
+
+            // Calculate the highest y of the top stack (positiveCircles)
+            let maxYPositive = d3.max(positiveCircles, d => d.y); // THIS IS OFF??
+
+            // Calculate the lowest y of the bottom stack (negativeCircles)
+            let maxYNegative = d3.min(negativeCircles, d => d.y);
+
+            // Find the middle point between the highest y of the top stack and the lowest y of the bottom stack
+            console.log("[D3] maxYPositive: " + maxYPositive + " maxYNegative: " + maxYNegative);
+
+            // let xAxisPosition = maxYPositive+(gapup+gapdown)/2;
+            // This works if charts are balanced only!
+            let xAxisPosition = chartHeight / 2 - gapup;
+
+
+            return {
+                circles: result,
+                xAxisPosition
+            };
+        }
+
+    </script>
+</body>
+
+</html>

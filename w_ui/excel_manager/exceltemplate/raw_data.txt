@@ -1,0 +1,13 @@
+Date	Time	Subject	Account Name	First Name	LastName	Location
+8/6/2018	11.00	Introduction	Motor Drive	D	Molloy	River
+8/6/2018	3.00	Site Visit	Barrlets	Paul	Fort	Black Stree
+8/7/2018	8.00	Site Visit	Smelter2	M	 Fletcher	Bull Run
+8/7/2018	1.00	Site Visit	B Engineering Group	David	Smith	Smith St
+8/8/2018	9.00	Presentation	Engineering Q	John	Duck	Donald
+8/8/2018	1.00	Presentation	Acres Inc	C	Turner	Revestroke
+8/9/2018	7.00	Site Visit	Ship Builder	William	Bruce	Williamstown
+8/9/2018	11.00	Introduction	Process Plant	Brendan	White	Wellington
+8/9/2018	1.00	Meeting	Fac Controls	R	Reed	Country A
+8/9/2018	3.00	Site Visit	Engineering 4	T	Manso	Twin Town
+8/10/2018	7.00	Site Visit	Steel Mill	Hannes	Jo 	Laverton
+8/10/2018	1.00	Meeting	XXYZ	John	Hurting	City

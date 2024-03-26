@@ -1,0 +1,80 @@
+#0v1# JC Jan 26, 2024
+
+
+###########################################################
+## GLOBAL CONFIGS  (recall, not git tracked)
+
+~/.ssh/authorized_keys
+
+THESE MUST BE MANUALLY MOVED TO SERVER (non git)
+
+w_settings.ini
+w_storage/gstorage/neo4j_settings.ini
+z_apiengine/db_config.ini
+w_admin/openai.ini
+z_server/aws/watchtower_webservices_user_accessKeys.ini
+
+
+## UNUSED:
+w_app_settings.ini
+chatskit_ui/config_chatgpt.ini   
+
+
+
+###########################################################
+## CODEBASE SHARE NOTES
+
+[1]  CLEARN MACHINE history
+- previous passwords etc.
+
+history -c && history -w
+
+[2]  github commit history watch pw in code etc.
+
+[3]  remove global github passwords
+git config --global --unset user.name
+git config --global --unset user.email
+git credential-cache exit
+
+-> remove github keys (just beware not to remove other keys)
+rm ~/.ssh/id_rsa
+rm ~/.ssh/id_rsa.pub
+
+
+###########################################################
+## STEPS TO CLEAR LOCAL GIT HISTORY:
+git checkout --orphan new_branch
+git add -A
+git commit -am "Base commit"
+git branch -D main
+git push -f origin main
+
+STEPS TO PULL EMPTY GIT HISTORY LOCALLY:
+(will not touch local .ini sqlite dbs if in .gitignore -- which should be already)
+git fetch --all
+git reset --hard origin/main
+
+
+###########################################################
+## STEPS TO SETUP SERVER
+#- create new user account
+
+- finaware dev server
+> clear history
+> 3.137.103.23, coredev.epventures.co, wt_finaware_dev.ppk
+
+
+###########################################################
+## STEPS TO PREPARE HAND-OFF PACKAGE
+- You can start a list of questions, though I already have a list of questions you'll want answers to.
+- current "status", what system supposed to do, what system does now, what's complete, what's not, priority task list, assigned tasks, product description, documentation, technical architectural review, roadmaps, 
+- tech docs: codebase, APIs, deployment processes, integrations, playgrounds, component interactions
+
+> share items:  github, spreadsheet, ppk, questions gathering.
+
+
+
+
+
+
+

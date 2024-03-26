@@ -1,0 +1,107 @@
+and 4 others joined.
+
+
+EP
+  2:14 PM
+https://siwei.io/en/fraud-detection-with-nebulagraph/ I was reviewing this with 
+@Jon
+ and 
+@Colin Schmitt
+ we need your help here, maybe we link in James and others, we want to build out a fraud model, so we need to classify, what is fraud, and we need examples via bank statements, transactions, we can do at both statement level and transaction level, to help train our model to identify when it runs the program to see if any immediate fraud has occurred.
+siwei.iosiwei.io
+Fraud Detection with NebulaGraph GraphDatabase in action
+This is a review of Fraud Detection methods based on graph algorithms, graph databases, machine learning, and graph neural networks on NebulaGraph, and in addition to an introduction to the basic methodological ideas, I've also got a Playground you can run. it's worth mentioning that this is the first time I've introduced you to the Nebula-DGL project :grin:.
+Jul 31st, 2022
+https://siwei.io/en/fraud-detection-with-nebulagraph/
+
+
+
+
+
+
+2:15
+@Colin Schmitt
+ Do you have any examples on a statement level / transaction level so we can work on training a fraud model, as I think that is a good tool for V2 or after FBI launch as an additional feature, we can just show it works on a small data set or fraud training set, and then apply larger scale when we get more info on what the fraud would be classified as ... Additionally, 
+@Colin Schmitt
+ We talked about other data sets, proof of life, and such, and could apply this here as well... and some other applications, so i think it would be good to build in ideally, if possible.
+
+
+EP
+  2:16 PM
+set the channel description: Incorporation of the Fraud Detection with NebulaGraph GraphDatabase
+
+
+Colin Schmitt
+  6:06 PM
+What type of data sets are you looking for?
+
+
+EP
+  7:56 PM
+Jon and I will work to build out a fraud model, see the article attached, complicated, but a fraud model to detect fraud among the statements uploaded, we can go statement level to transaction level, but in order to do this, we need to train the model on what is defined as "Fraud," therefore, we need to classify fraud on bank statements, to transaction level , so our model can be trained and then identify ongoing these instances as fraud
+
+
+Jon
+  7:05 PM
+Ideally 'fraud' identified at any relevant transaction-level.  The reasoning for the flag isn't needed explicitly because the model would -- ideally -- be able to infer the reason.  But yes, at least a dozen or so samples to start -- but the exact volume + even our approach is tbd.  Evan, you may want to consider naming this a bit more informal to begin.  So less of a 'fraud detection' and maybe along the lines as  "Watch IT"*   ie:  the "Watch It"* score flags possible/common patterns that may indicate fraudulent activity.
+
+
+EP
+  11:22 PM
+Hey 
+@Jon
+ I like that idea for V1 of the “fraud detection,” so Watch Red Flag and score of risk that may indicate fraudulent activity. We can also pull from DOJ press releases for that to help generate score.
+We will need 
+@Colin Schmitt
+ to share these metrics with us so we can build it in
+
+
+EP
+  11:29 AM
+renamed the channel from “fraud-model-” to “suspicious-activity-model”
+
+
+EP
+  11:30 AM
+renamed the channel from “suspicious-activity-model” to “sti-model-suspicious-transaction-indicators”
+
+
+EP
+  11:30 AM
+renamed the channel from “sti-model-suspicious-transaction-indicators” to “stimscore-suspicioustransactionindicatorscore”
+
+
+Colin Schmitt
+  1:07 PM
+Suspicious (S), Transaction (T), Indicator (I), Measurement (M), score
+1:08
+Transactions indicative of illegal behavior Money Laundering (ML), Bribery/Extortion (B/E), Theft (T)
+1:09
+ML-Structuring,  2 or more transactions that are at or below $10,000.
+1:10
+ML - Transactions from OFAC countries including Mexico, Ukraine, etc.
+1:11
+ML - Multiple cash deposits that are round numbered with no "pennies. Example $5,000
+1:11
+ML - Cash transactions happen on the same day or at same interval of days.
+1:12
+B/E - Cash deposits/wire are same amounts in round numbers (No pennies)
+1:13
+T - Wire or check sent to account from company account in a round number or same amount
+1:14
+T - Large wires (>$10,000)
+1:15
+ML - Casino transactions, Correspondent banking transactions.
+
+
+EP
+  1:50 PM
+Also in the calculation should be any parties listed on https://ofac.treasury.gov/ofac-sanctions-lists, so check all the companies where monies were sent / received from to see if they match ... which would give a 100 risk score, and then also to add in the DOJ Press releases to see if the name of the account holder / or business name pops up as a party who the DOJ has charged or is being investigated.
+:eyes:
+1
+
+
+
+============
+
+

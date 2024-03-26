@@ -1,0 +1,32 @@
+How many transactions?
+[debug] started llm query [gpt-3.5-turbo]: 2023-10-05 14:26:41.517658
+[debug] LLM runtime: 5.8040900230407715 seconds
+[AI] cypher (to execute):
+MATCH (t:Transaction)-[:HAS_TRANSACTION]->(:Entity)-[:DEBIT_FROM]->(:Transaction)-[:CREDIT_TO]->(:Entity)
+WHERE t.case_id = 'demo_a'
+RETURN COUNT(t) AS NumberOfTransactions
+given JSONL: [{'NumberOfTransactions': 0}]
+
+
+List all transactions over $10000
+[debug] started llm query [gpt-3.5-turbo]: 2023-10-05 14:31:54.118514
+[debug] LLM runtime: 3.9402971267700195 seconds
+[AI] cypher (to execute):
+MATCH (t:Transaction)-[:DEBIT_FROM]->(e:Entity)
+WHERE t.transaction_amount > 10000
+AND t.case_id = 'demo_a'
+RETURN t
+given JSONL: []
+[debug] working with raw data: []
+
+
+List all transaction amounts with date
+[debug] started llm query [gpt-3.5-turbo]: 2023-10-05 14:36:12.807365
+[debug] LLM runtime: 2.9387881755828857 seconds
+[AI] cypher (to execute):
+MATCH (t:Transaction)-[:HAS_TRANSACTION]->()-[:CREDIT_TO]->(:Entity)
+WHERE t.case_id = 'demo_a'
+RETURN t.transaction_amount, t.transaction_date
+given JSONL: []
+[debug] working with raw data: []
+

@@ -1,0 +1,40 @@
+import time
+import os
+import sys
+import codecs
+import json
+import re
+
+LOCAL_PATH = os.path.abspath(os.path.dirname(__file__))+"/"
+sys.path.insert(0,LOCAL_PATH)
+
+
+#0v1# JC  Sep  2, 2023  Init
+
+
+def dev1():
+    return
+
+
+if __name__=='__main__':
+    branches=['dev1']
+
+    for b in branches:
+        globals()[b]()
+
+
+
+"""
+#https://colab.research.google.com/drive/1kTlVSRXeJYvPL7vhRCf8oIthCLg4VcCl#scrollTo=7d2gXzA_ClcT
+from llama_index.query_engine import KnowledgeGraphQueryEngine
+
+from llama_index.storage.storage_context import StorageContext
+from llama_index.graph_stores import NebulaGraphStore
+
+nl2kg_query_engine = KnowledgeGraphQueryEngine(
+    storage_context=storage_context,
+    service_context=service_context,
+    llm=lc_llm,
+)
+
+"""

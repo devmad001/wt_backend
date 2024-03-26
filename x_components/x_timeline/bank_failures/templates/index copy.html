@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <style>
+        svg[class*="plot"] {
+            width-max: 100% !important;
+            /* override the width to 70% */
+            display: block;
+            /* make sure the SVG acts like a block-level element */
+            margin: 0 auto;
+            /* center the SVG block horizontally */
+            max-height: 100%; /* Ensures the SVG doesn't grow beyond its' container
+        }
+    </style>
+
+    <title>Bank failures</title>
+    <link rel="stylesheet" type="text/css" href="/static/inspector.css">
+    <script src="https://cdn.jsdelivr.net/npm/@graphcms/zoid@9.0.64-alpha.1/lib/zoid.js"></script>
+    <script>
+        // 0v1
+        const child_name = 'timeline'; // Define the child's name here
+
+        // Function to receive a message from another component (parent or child)
+        function receiveMessage(message) {
+            console.log(`Message received in ${child_name}:`, message);
+
+            const source = message.source || 'Unknown';
+            const key = message.key;
+            const value = message.value;
+
+            console.log(`Message received from ${source}.`);
+
+            // Handle action based on the key-value pair
+            switch (key) {
+                case 'change_background_color':
+                    if (value && value.color) {
+                        document.body.style.backgroundColor = value.color;
+                    }
+                    break;
+
+                case 'refresh_window_url':
+                    if (value && value.url) {
+                        window.location.href = value.url;
+                    }
+                    break;
+
+                default:
+                    console.log("Unknown message key:", key);
+                    break;
+            }
+                
+
+
+            // Send acknowledgement back to the parent
+            sendMessageToParent('ack', 'Acknowledged');
+        }
+
+        // Function to send message to parent
+        function sendMessageToParent(key, value) {
+            if (window.xprops[`receiveParentMessageFrom_${child_name}`]) {
+                window.xprops[`receiveParentMessageFrom_${child_name}`]({
+                    source: child_name,
+                    key: key,
+                    value: value
+                });
+            }
+        }
+        
+        // Initialize function
+        function initialize() {
+            if (typeof window.xprops === 'undefined') {
+                console.error('window.xprops is undefined (or parent not found)');
+                return;
+            }
+
+            // Register the receiveMessage function
+            if (window.xprops.registerChildCallback) {
+                window.xprops.registerChildCallback(receiveMessage);
+            }
+
+            // Generalized function to send message to any child
+            window.sendMessageToChild = function(target_child_name, key, value) {
+                const message = {
+                    source: child_name, // use the generalized child_name
+                    key: key,
+                    value: value
+                };
+                window.xprops.relayMessageToChild(target_child_name, message);
+            };
+        }
+
+        window.addEventListener('DOMContentLoaded', initialize);
+
+        // Zoid configuration
+        zoid.create({
+            tag: `${child_name}-component`, // use the generalized child_name
+            props: {
+                relayMessageToChild: {
+                    type: 'function',
+                    required: false
+                },
+                registerChildCallback: {
+                    type: 'function',
+                    required: false
+                },
+                [`receiveParentMessageFrom_${child_name}`]: { // use the generalized child_name
+                    type: 'function',
+                    required: false
+                }
+            }
+        });
+    </script>
+</head>
+<body>
+
+<script type="module">
+    import define from "/static/index.js";
+    import { Runtime, Library, Inspector } from "/static/runtime.js";
+
+    const runtime = new Runtime();
+    const main = runtime.module(define, Inspector.into(document.body));
+</script>
+
+<script type="module">
+    import define from "/static/index.js";
+    import { Runtime, Library, Inspector } from "/static/runtime.js";
+
+    const runtime = new Runtime();
+
+    function loadGraph(csvName) {
+        // Remove the old graph content
+        document.body.innerHTML = '';
+
+        // Instantiate the graph with the new CSV data
+        runtime.module(define, Inspector.into(document.body), csvName);
+    }
+
+    // Initially load the graph with the first data set
+    loadGraph("bfb-data@2.csv");
+
+    // Refresh the graph with the new data set after 5 seconds
+    setTimeout(() => {
+        loadGraph("bfb-data@3.csv");
+    }, 5000);
+</script>
+
+    
+</body>
+</html>

@@ -1,0 +1,570 @@
+[50Q Report for: case_atm_location ran on: 2023-10-12 09:45:05.995317
+1==================================================
+[question]: What is the Primary account number for bank statement? 
+[runtime]: 1.6897780895233154
+[answer]: The Primary account number for the bank statement is 000000651770569.
+[df]: Primary_Account_Number
+       000000651770569
+2==================================================
+[question]: What is the beginning monthly balance?  
+[runtime]: 7.334185361862183
+[answer]: Sorry, I can't answer that yet.  (Cypher does not filter on parameter .case id.) [ref #7d3e9ab9-a5a0-42ec-9da4-323cf0eae503]
+3==================================================
+[question]: What is the date the Account Opened? 
+[runtime]: 8.383080959320068
+[answer]: Sorry, I can't answer that yet.  (Cypher does not filter on parameter .case id.) [ref #eff7fe10-9073-46d4-9b84-c536b49873ac]
+4==================================================
+[question]: What are the total deposits and additions?  
+[runtime]: 0.8773355484008789
+[answer]: The total amount of deposits and additions is $20,118.
+[df]:  total_deposits_and_additions
+                     20117.77
+5==================================================
+[question]: What is the total deposits and additions for the Month?  
+[runtime]: 0.7143998146057129
+[answer]: The total deposits and additions for the month is $0.
+[df]:  total_deposits_and_additions_for_the_month
+                                          0
+6==================================================
+[question]: What is the total deposits and additions for the Year?  
+[runtime]: 0.8026671409606934
+[answer]: The total deposits and additions for the year is $15,774.
+[df]:  total_deposits_and_additions_for_the_year
+                                   15774.0
+7==================================================
+[question]: What is the total deposits and additions for the Quarter? 
+[runtime]: 0.601097822189331
+[answer]: The total deposits and additions for the Quarter is $15,774.
+[df]:  total_quarterly_deposits_and_additions
+                                15774.0
+8==================================================
+[question]: What is the total deposits and additions for the Day? 
+[runtime]: 0.6486263275146484
+[answer]: The total deposits and additions for the day is $0.
+[df]:  total_deposits_and_additions
+                            0
+9==================================================
+[question]: What are the total deposits for the Month?  
+[runtime]: 0.869312047958374
+[answer]: The total deposits for the month amount to $15,774.
+[df]:  total_monthly_deposits
+                15774.0
+10==================================================
+[question]: What are the total deposits for the Year? 
+[runtime]: 1.2213306427001953
+[answer]: The total deposits for the year amount to $15,774.
+[df]:  total_deposits_year
+             15774.0
+11==================================================
+[question]: What are the total deposits for the Quarter? 
+[runtime]: 1.064469814300537
+[answer]: The total deposits for the Quarter amount to $15,774.
+[df]:  total_quarter_deposits
+                15774.0
+12==================================================
+[question]: What are the total deposits for the Day?  
+[runtime]: 0.5786783695220947
+[answer]: The total deposits for the day amount to $15,774.
+[df]:  total_deposits_today
+              15774.0
+13==================================================
+[question]: What are the total inflows? 
+[runtime]: 0.5304105281829834
+[answer]: The total inflows are $2890.
+[df]:  total_inflows
+        2890.0
+14==================================================
+[question]: What is the total number of outflows? (Defined as money going out, so leaving account)  
+[runtime]: 0.5053441524505615
+[answer]: The total number of outflows, defined as money going out of the account, is 36.
+[df]:  total_outflows
+             36
+15==================================================
+[question]: What is the total number of outflows via cash withdrawal? 
+[runtime]: 0.5053439140319824
+[answer]: The total number of outflows via cash withdrawal is 0.
+[df]:  total_cash_withdrawals
+                      0
+16==================================================
+[question]: What is the total number of outflows via check?  
+[runtime]: 0.4887986183166504
+[answer]: The total number of outflows via check is 0.
+[df]:  total_outflows_check
+                    0
+17==================================================
+[question]: What is the total number of outflows via credit card payments? 
+[runtime]: 0.562004804611206
+[answer]: The total number of outflows via credit card payments is 0.
+[df]:  total_credit_card_outflows
+                          0
+18==================================================
+[question]: What is the total number of outflows via Zelle, and what is the ID number? 
+[runtime]: 0.6031029224395752
+[answer]: The total number of outflows via Zelle is 1, and the ID number associated with this transaction is dfd304178cac957d11144256c030f656a1154b60d7bcbb467499e39d060f463c.
+[df]:                                                        ID_number  total_outflows_via_Zelle
+dfd304178cac957d11144256c030f656a1154b60d7bcbb467499e39d060f463c                         1
+38f395b8905817be032e39c1f5e168b576be9f9df49f2a8b5842c311830fc9f3                         1
+81346ce2d17324b1cee0376ae59ea1d6b1444b1dfe5f95b5e4c45cc056abf126                         1
+a95bb2ff6772fd4a931cf01c3d7f2532fcc3c4b9c3f11c6f34d72c711e2afb93                         1
+412f6a33dbc37f17b49a63b551c40aff49d3ffc5fcb2f8357bb2912497f2879e                         1
+6f915dfb80fe8cbbad139363815e6349e7c02b4f91bbcf6e1432f37cdfdd7da4                         1
+c53cc6edaa90e76e58d46867c65265963707ba0cacfc434f5b6c1e0149418cef                         1
+2d416cd2421b34a079b9847712235b03215d44e6a60745cdda7f4ca252f80d8f                         1
+0d6a689e2ac08de83eefd973ec5ce2ca68b911fbb7ff114445facf125d4397a7                         1
+97731dd5b0c72eed29c07dd97dd298f9d3c277f24fcb5a2d72972dc9fb770868                         1
+53504e920761c1edd860c8fd01022de13f094917eb959ae37c4eab1257c62ee0                         1
+f0245e3d93f589c9ca98f7ba8b99eebec50a392afa821f4d2316748f7d45d2de                         1
+297f4bc930d6c26d7062e21c8e7e8d3680bcec282b950e726c0e09c887262ccb                         1
+cdd2a2ce2bff8ae6047124d8ec482280d1621701abb0cf887043b3c95748be0a                         1
+02428b23eae8aed888936c876d58cea5c3bb9eddd2a09395c6290e3639fffb32                         1
+b6a7ce72e318cb1ba02ab3274fea0aade5d0b7fd3e3faea3e80c77f8877cb1ed                         1
+6226d72536dcef4c59f5a01296e63bb21afd1e1eb3ceb417f23fb8f852019528                         1
+0f730e16b6bcddbdb58293174f7effe6ff7c655d23953e557ab7b3d6b2c1a2f8                         1
+197fc563e17c30ef630d04730c74a7cf565c51b0f1a0e3d5db5703668c8498ef                         1
+64dc6386e930ba814a8598972d4cfd48dd6d40d51a23a39c3c4a2bd649438413                         1
+5d15e5c1d70fcad85965df53645490f1ab9aabcfb1228e09712f733992e24273                         1
+c2519a9404874023c3e862a89e6c07b932aa0bbe7563f6958aaaff9b15b6238c                         1
+1f949066b6df02271e3adc8f352322166a637b3ee20ef24348f66f9e7a1e09ed                         1
+daab7d531092be8dbd05306106b1dd7244e1013c1d4a62cb80afdfb39a202099                         1
+19==================================================
+[question]: What is the total number of outflows via Wire? 
+[runtime]: 0.506354570388794
+[answer]: The total number of outflows via Wire is 0.
+[df]:  total_outflows_via_wire
+                       0
+20==================================================
+[question]: What is the total number of outflows via bank fees? 
+[runtime]: 0.5941050052642822
+[answer]: The total number of outflows via bank fees is 0.
+[df]:  total_outflow_via_bank_fees
+                           0
+21==================================================
+[question]: What % of the withdrawals are ATM vs debit card? 
+[runtime]: 0.6256628036499023
+[answer]: Approximately 2.78% of the withdrawals are made using an ATM, while around 16.67% of the withdrawals are made using a debit card.
+[df]:  DebitCard_Percentage  ATM_Percentage
+            16.666667        2.777778
+22==================================================
+[question]: How many electronic withdrawals occurred in total by day, month, year and quarter? 
+[runtime]: 0.7840962409973145
+[answer]: In total, there were electronic withdrawals that occurred on the following dates: August 2nd, August 4th, August 5th, August 6th, August 9th, August 12th, August 13th, August 16th, August 17th, August 18th, August 19th, August 20th, August 25th, August 26th, and August 30th. The total number of electronic withdrawals on each day is as follows: 
+- August 2nd: 4 withdrawals
+- August 4th: 2 withdrawals
+- August 5th: 1 withdrawal
+- August 6th: 1 withdrawal
+- August 9th: 1 withdrawal
+- August 12th: 1 withdrawal
+- August 13th: 1 withdrawal
+- August 16th: 9 withdrawals
+- August 17th: 1 withdrawal
+- August 18th: 3 withdrawals
+- August 19th: 2 withdrawals
+- August 20th: 1 withdrawal
+- August 25th: 2 withdrawals
+- August 26th: 2 withdrawals
+- August 30th: 4 withdrawals
+
+Using this information, we can summarize the electronic withdrawals by month and year. All the withdrawals mentioned above occurred in August 2021. 
+
+Additionally, we can group the withdrawals by quarter. Since all the withdrawals occurred in August 2021, they fall under the '2021 Q4' quarter.
+
+Please note that the transaction amounts are rounded to the nearest dollar and expressed in US dollars.
+[df]:       Date Year Quarter   Month  total_electronic_withdrawals
+2021-08-02 2021 2021 Q4 2021-08                             4
+2021-08-04 2021 2021 Q4 2021-08                             2
+2021-08-05 2021 2021 Q4 2021-08                             1
+2021-08-06 2021 2021 Q4 2021-08                             1
+2021-08-09 2021 2021 Q4 2021-08                             1
+2021-08-12 2021 2021 Q4 2021-08                             1
+2021-08-13 2021 2021 Q4 2021-08                             1
+2021-08-16 2021 2021 Q4 2021-08                             9
+2021-08-17 2021 2021 Q4 2021-08                             1
+2021-08-18 2021 2021 Q4 2021-08                             3
+2021-08-19 2021 2021 Q4 2021-08                             2
+2021-08-20 2021 2021 Q4 2021-08                             1
+2021-08-25 2021 2021 Q4 2021-08                             2
+2021-08-26 2021 2021 Q4 2021-08                             2
+2021-08-30 2021 2021 Q4 2021-08                             4
+23==================================================
+[question]: How many electronic withdrawals occurred by Wire 
+[runtime]: 0.7961812019348145
+[answer]: There were 0 electronic withdrawals made by Wire.
+[df]:  total_wire_withdrawals
+                      0
+24==================================================
+[question]: How many electronic withdrawals occurred by Zelle,  
+[runtime]: 0.6361904144287109
+[answer]: There were 24 electronic withdrawals that occurred through Zelle.
+[df]:  zelle_withdrawals_count
+                      24
+25==================================================
+[question]: What is the ending balance of the statement by Date? 
+[runtime]: 6.310804128646851
+[answer]: I'm sorry, but I don't have the information to answer your question. The provided response to the Cypher query is empty, so we don't have an ending balance for the statement by date.
+[df]: Empty DataFrame
+Columns: []
+Index: []
+26==================================================
+[question]: How many book transfer credits occurred? Between which entity? From which bank? On which date, for how much money?  
+[runtime]: 0.5710177421569824
+[answer]: I don't know the answer.
+[df]: Empty DataFrame
+Columns: []
+Index: []
+27==================================================
+[question]: How many Zelle payments were made over the course of the month? Id Accounts sent and received? 
+[runtime]: 0.8302075862884521
+[answer]: Over the course of the month, there were a total of 1 Zelle payment made. The Zelle payment was sent from the account with the ID 'case_atm_location-000000651770569' and received by the account with the ID 'Jpm669604904'.
+[df]:                           Account_Sent           Account_Received  total_Zelle_payments
+     case_atm_location-000000651770569               Jpm669604904                     1
+     case_atm_location-000000651770569 paris sugi dba 12323832406                     1
+     case_atm_location-000000651770569                12323832406                     1
+     case_atm_location-000000651770569               Jpm671584743                     1
+     case_atm_location-000000651770569               Jpm674243402                     1
+     case_atm_location-000000651770569               Jpm677655611                     1
+     case_atm_location-000000651770569               Jpm678129044                     1
+case_atm_location-10753550202000000062               Jpm679645738                     1
+case_atm_location-10753550202000000062               Jpm679646274                     1
+case_atm_location-10753550202000000062               Jpm679646739                     1
+case_atm_location-10753550202000000062               Jpm680556028                     1
+case_atm_location-10753550202000000062                 Liz Flores                     1
+case_atm_location-10753550202000000062               Jpm680632971                     1
+case_atm_location-10753550202000000062               Lil Bro Alex                     1
+case_atm_location-10753550202000000062                12392431698                     1
+case_atm_location-10753550202000000062                     Martin                     1
+case_atm_location-10753550202000000062               Jpm681483026                     1
+case_atm_location-10753550202000000062               Jpm681450613                     1
+case_atm_location-10753550202000000062               Jpm682224864                     1
+case_atm_location-10753550202000000062               Jpm683042972                     1
+case_atm_location-10753550202000000062               Jpm683291589                     1
+case_atm_location-10753550202000000062               Jpm683992094                     1
+case_atm_location-10753550202000000062                12410934415                     1
+case_atm_location-10753550202000000062                        JPM                     2
+case_atm_location-10753550202000000062               Jpm684249239                     1
+case_atm_location-10753550202000000062                12415184384                     1
+case_atm_location-10753550202000000062               Jpm686601797                     1
+case_atm_location-10753550202000000062                12454300327                     1
+case_atm_location-10753550202000000062                12454479493                     1
+case_atm_location-10753550202000000062               Jpm692978891                     1
+case_atm_location-10753550202000000062               Jpm693056458                     1
+case_atm_location-10753550202000000062               Jpm696293969                     1
+case_atm_location-10753550202000000062               Jpm696526753                     1
+case_atm_location-10753550202000000062                12480636458                     1
+case_atm_location-10753550202000000062               Jpm699325459                     1
+28==================================================
+[question]: How many Fed Wire credits came in during the month? ID accounts sent and received. 
+[runtime]: 0.5714118480682373
+[answer]: During the month, there were 0 Fed Wire credits that came in. No account numbers were received.
+[df]: account_numbers_received  total_fed_wire_credits
+                      []                       0
+29==================================================
+[question]: What is the payment ID on Zelle Transfers? 
+[runtime]: 0.6968679428100586
+[answer]: The payment ID on Zelle Transfers is Jpm669604904, 12323832406, Jpm671584743, Jpm674243402, Jpm677655611, Jpm678129044, Jpm679645738, Jpm679646274, Jpm679646739, Jpm680556028, Jpm680632971, 12392431698, Jpm681483026, Jpm681450613, Jpm682224864, Jpm683042972, Jpm683291589, Jpm683992094, 12410934415, Jpm684249239, 12415184384, Jpm686601797, 12454300327, 12454479493, Jpm692978891, Jpm693056458, Jpm696293969, Jpm696526753, 12480636458, and Jpm699325459.
+[df]: Zelle_Transfer_Payment_ID
+             Jpm669604904
+              12323832406
+             Jpm671584743
+             Jpm674243402
+             Jpm677655611
+             Jpm678129044
+             Jpm679645738
+             Jpm679646274
+             Jpm679646739
+             Jpm680556028
+             Jpm680632971
+              12392431698
+             Jpm681483026
+             Jpm681450613
+             Jpm682224864
+             Jpm683042972
+             Jpm683291589
+             Jpm683992094
+              12410934415
+             Jpm684249239
+              12415184384
+             Jpm686601797
+              12454300327
+              12454479493
+             Jpm692978891
+             Jpm693056458
+             Jpm696293969
+             Jpm696526753
+              12480636458
+             Jpm699325459
+30==================================================
+[question]: List of all companies where monies were sent and received? 
+[runtime]: 0.44318079948425293
+[answer]: I'm sorry, but I don't have the answer to your question. The provided information does not contain any data about the companies where monies were sent and received.
+[df]: Empty DataFrame
+Columns: []
+Index: []
+31==================================================
+[question]: List of all banks and amounts sent and received? 
+[runtime]: 21.237748622894287
+[answer]: The list of all banks and the corresponding amounts sent and received is as follows:
+- JPMorgan Chase Bank, N.A.: $11,631 sent, $5,802 received.
+[df]:                      Bank  Total_Amount_Sent  Total_Amount_Received
+JPMorgan Chase Bank, N.A.           11630.92                 5802.0
+32==================================================
+[question]: Top ATM used, Top bank used, Top Loan accounts, Top Credit Card Accounts 
+[runtime]: 74.26360559463501
+[answer]: I'm sorry, but I don't have the information to provide the top ATM used, top bank used, top loan accounts, or top credit card accounts.
+[df]: Empty DataFrame
+Columns: []
+Index: []
+33==================================================
+[question]: List top 10 payees for time-period with totals for each
+[runtime]: 43.034724712371826
+[answer]: The top 10 payees for the specified time period, along with the total amount paid to each, are as follows:
+
+1. Payee: [Payee's Name]
+   Total Paid: [Total Amount Paid to Payee]
+
+2. Payee: [Payee's Name]
+   Total Paid: [Total Amount Paid to Payee]
+
+3. Payee: [Payee's Name]
+   Total Paid: [Total Amount Paid to Payee]
+
+4. Payee: [Payee's Name]
+   Total Paid: [Total Amount Paid to Payee]
+
+5. Payee: [Payee's Name]
+   Total Paid: [Total Amount Paid to Payee]
+
+6. Payee: [Payee's Name]
+   Total Paid: [Total Amount Paid to Payee]
+
+7. Payee: [Payee's Name]
+   Total Paid: [Total Amount Paid to Payee]
+
+8. Payee: [Payee's Name]
+   Total Paid: [Total Amount Paid to Payee]
+
+9. Payee: [Payee's Name]
+   Total Paid: [Total Amount Paid to Payee]
+
+10. Payee: [Payee's Name]
+    Total Paid: [Total Amount Paid to Payee]
+
+Please note that the amounts are rounded to the nearest dollar and are in US dollars.
+[df]: Payee  Total_Paid
+         11630.92
+34==================================================
+[question]: List top 10 payors for time-period with totals for each
+[runtime]: 12.176442384719849
+[answer]: Based on the provided information, I don't know the answer.
+[df]: Empty DataFrame
+Columns: []
+Index: []
+35==================================================
+[question]: List all payments to IRS and total amount.
+[runtime]: 10.55392050743103
+[answer]: Based on the provided information, there have been no payments to the IRS in the specified case and therefore the total amount paid is $0.
+[df]: Empty DataFrame
+Columns: []
+Index: []
+36==================================================
+[question]: List all payees/payors that paid/received with the last five digits of amount as 000.00 and list the amount.
+[runtime]: 9.759277105331421
+[answer]: Based on the provided information, there are no payees/payors that paid/received with the last five digits of the amount as 000.00.
+[df]: Empty DataFrame
+Columns: []
+Index: []
+37==================================================
+[question]: List all ATM transactions by location.
+[runtime]: 20.234923839569092
+[answer]: Here are the ATM transactions listed by location:
+
+- Transaction Date: 2021-08-24
+  Transaction Amount: $700
+  ATM Location: unknown
+  ATM Latitude: 34.187
+  ATM Longitude: -118.396
+
+- Transaction Date: 2021-08-02
+  Transaction Amount: $500
+  ATM Location: unknown
+  ATM Latitude: 34.187
+  ATM Longitude: -118.396
+
+Please note that the specific ATM locations are currently unknown.
+[df]: Transaction_Date ATM_Location  Latitude   Longitude  Transaction_Amount
+      2021-08-24      unknown 34.186998 -118.395934               700.0
+      2021-08-02      unknown 34.186998 -118.395934               500.0
+38==================================================
+[question]: List all ATM transactions in order of amounts.
+[runtime]: 11.923589706420898
+[answer]: Here are the ATM transactions in order of amounts:
+
+- Transaction amount: $700
+  Transaction date: August 24, 2021
+
+- Transaction amount: $500
+  Transaction date: August 2, 2021
+[df]: Transaction_Date  ATM_Transaction_Amount
+      2021-08-24                   700.0
+      2021-08-02                   500.0
+39==================================================
+[question]: List credit card payments in order of amount and total.
+[runtime]: 12.730714797973633
+[answer]: I'm sorry, but I don't have enough information to provide a helpful answer. The Cypher query did not return any results, so there are no credit card payments to list in order of amount and total.
+[df]: Empty DataFrame
+Columns: []
+Index: []
+40==================================================
+[question]: List all Debit transactions by location.
+[runtime]: 120.96861863136292
+[answer]: Here is a list of all debit transactions along with their corresponding locations:
+
+- Transaction 1: Debit Amount: $700 - Location: Unknown (Latitude: 34.187, Longitude: -118.396)
+- Transaction 2: Debit Amount: $25 - Location: 7397 (Latitude: -116.197, Longitude: 33.704)
+- Transaction 3: Debit Amount: $50 - Location: 7397 (Latitude: -116.197, Longitude: 33.704)
+- Transaction 4: Debit Amount: $11 - Location: 7413 (Latitude: -90.049, Longitude: 35.150)
+- Transaction 5: Debit Amount: $25 - Location: 7413 (Latitude: -90.049, Longitude: 35.150)
+- Transaction 6: Debit Amount: $8 - Location: 7413 (Latitude: -90.049, Longitude: 35.150)
+- Transaction 7: Debit Amount: $8 - Location: 7413 (Latitude: -90.049, Longitude: 35.150)
+- Transaction 8: Debit Amount: $3000 - Location: Jpm665864367 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 9: Debit Amount: $10 - Location: Jpm667436915 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 10: Debit Amount: $200 - Location: Jpm667437893 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 11: Debit Amount: $10 - Location: Jpm667438464 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 12: Debit Amount: $350 - Location: Jpm669535918 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 13: Debit Amount: $60 - Location: Jpm669604904 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 14: Debit Amount: $500 - Location: 12323832406 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 15: Debit Amount: $300 - Location: Jpm671584743 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 16: Debit Amount: $200 - Location: Jpm674243402 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 17: Debit Amount: $172 - Location: Jpm677655611 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 18: Debit Amount: $1000 - Location: Jpm678129044 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 19: Debit Amount: $1000 - Location: Jpm679645738 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 20: Debit Amount: $1000 - Location: Jpm679646274 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 21: Debit Amount: $500 - Location: Jpm679646739 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 22: Debit Amount: $420 - Location: Jpm680556028 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 23: Debit Amount: $700 - Location: Jpm680632971 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 24: Debit Amount: $20 - Location: 12392431698 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 25: Debit Amount: $400 - Location: Jpm681483026 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 26: Debit Amount: $100 - Location: Jpm681450613 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 27: Debit Amount: $90 - Location: Jpm682224864 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 28: Debit Amount: $300 - Location: Jpm683042972 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 29: Debit Amount: $1300 - Location: Jpm683291589 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 30: Debit Amount: $150 - Location: Jpm683992094 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 31: Debit Amount: $30 - Location: 12410934415 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 32: Debit Amount: $102 - Location: Jpm684249239 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 33: Debit Amount: $120 - Location: 12415184384 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 34: Debit Amount: $500 - Location: Jpm686601797 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 35: Debit Amount: $35 - Location: 12454300327 (Latitude: Unknown, Longitude: Unknown)
+- Transaction 36: Debit Amount: $30 - Location: 12454479493 (Latitude: Unknown, Longitude: Unknown)
+
+Please note that the latitude and longitude information is unavailable for some transactions.
+[df]:         Name   Longitude    Latitude  Debit_Amount
+     unknown -118.395934   34.186998        700.00
+        7397    33.70395 -116.196915         24.99
+        7397    33.70395 -116.196915         49.99
+        7413    35.14953   -90.04898         10.99
+        7413    35.14953   -90.04898         24.99
+        7413    35.14953   -90.04898          8.20
+        7413    35.14953   -90.04898          7.99
+Jpm665864367                               3000.00
+Jpm667436915                                 10.00
+Jpm667437893                                200.00
+Jpm667438464                                 10.00
+Jpm669535918                                350.00
+Jpm669604904                                 60.00
+ 12323832406                                500.00
+Jpm671584743                                300.00
+Jpm674243402                                200.00
+Jpm677655611                                172.00
+Jpm678129044                               1000.00
+Jpm679645738                               1000.00
+Jpm679646274                               1000.00
+Jpm679646739                                500.00
+Jpm680556028                                420.00
+Jpm680632971                                700.00
+ 12392431698                                 20.00
+Jpm681483026                                400.00
+Jpm681450613                                100.00
+Jpm682224864                                 90.00
+Jpm683042972                                300.00
+Jpm683291589                               1300.00
+Jpm683992094                                150.00
+ 12410934415                                 30.00
+Jpm684249239                                102.00
+ 12415184384                                120.00
+Jpm686601797                                500.00
+ 12454300327                                 35.00
+ 12454479493                                 30.00
+41==================================================
+[question]: List all Debit transactions by amount.
+[runtime]: 8.978994607925415
+[answer]: I'm sorry, but I don't have any information about the debit transactions by amount.
+[df]: Empty DataFrame
+Columns: []
+Index: []
+42==================================================
+[question]: List Venmo transactions by top recipient/receiver
+[runtime]: 8.34716272354126
+[answer]: I'm sorry, but I don't have the information to answer your question.
+[df]: Empty DataFrame
+Columns: []
+Index: []
+43==================================================
+[question]: List all Credit Cards paid.
+[runtime]: 11.549596786499023
+[answer]: I'm sorry, but I don't have any information about credit cards being paid based on the provided data.
+[df]: Empty DataFrame
+Columns: []
+Index: []
+44==================================================
+[question]: List all Debit cards on the account.
+[runtime]: 12.93566346168518
+[answer]: The list of Debit cards on the account includes the following account numbers: 000000651770569, None, None, None, 000000651770569, None, 000000651770569, None, 000000651770569, None, None, 000000651770569, None.
+[df]: Debit_Card_Account_Numbers
+           000000651770569
+                          
+           000000651770569
+                          
+           000000651770569
+                          
+           000000651770569
+                          
+           000000651770569
+                          
+                          
+           000000651770569
+                          
+45==================================================
+[question]: List any transactions that use the word “Airport.”
+[runtime]: 6.467834234237671
+[answer]: There are no transactions that use the word "Airport" in the description.
+[df]: Empty DataFrame
+Columns: []
+Index: []
+46==================================================
+[question]: List any transactions that use the word “Ammo.”
+[runtime]: 6.624751567840576
+[answer]: I'm sorry, but there are no transactions in the database that use the word "Ammo."
+[df]: Empty DataFrame
+Columns: []
+Index: []
+47==================================================
+[question]: List any transactions that use the word “Chemical.”
+[runtime]: 5.552277326583862
+[answer]: There are no transactions that use the word "Chemical."
+[df]: Empty DataFrame
+Columns: []
+Index: []
+48==================================================
+[question]: Program needs to list out all transactions related to a specific word or word string. 
+[runtime]: 7.489466905593872
+[answer]: I'm sorry, but I couldn't find any transactions related to the specific word or word string you provided.
+[df]: Empty DataFrame
+Columns: []
+Index: []
+49==================================================
+[question]: List all cash transactions, Deposit, Check written to “Cash,” and ATM withdrawal. 
+[runtime]: 28.291638374328613
+[answer]: I'm sorry, but I don't have any information on cash transactions, deposit, check written to "Cash," and ATM withdrawal for the given case.
+[df]: Empty DataFrame
+Columns: []
+Index: []
+FUll runtime: 475.0626587867737

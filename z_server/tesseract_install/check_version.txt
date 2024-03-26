@@ -1,0 +1,46 @@
+JON NOTES??
+
+tesseract --version
+
+other will build from source or do:
+
+Option 2: Add Tesseract 5 PPA
+The new 5.x release series is available in the another PPA for Ubuntu 18.04, Ubuntu 20.04, and Ubuntu 22.04, 23.04.
+Also, press Ctrl+Alt+T to open terminal and run command:
+
+## PRECOMPILED:  (rather then install_tesseract.sh)
+
+** JON RAN THIS SEEING version 5.3.2
+
+
+#############################
+# WORKS::
+#############################
+sudo add-apt-repository ppa:alex-p/tesseract-ocr5
+sudo apt update
+sudo apt install tesseract-ocr -y
+#############################
+
+OTHER DETAILS:
+
+https://tesseract-ocr.github.io/tessdoc/Installation.html
+
+
+
+//// OPTION 2:
+
+sudo apt update
+sudo apt install build-essential autoconf libtool pkg-config
+
+sudo apt install libleptonica-dev
+git clone https://github.com/tesseract-ocr/tesseract.git
+cd tesseract
+./autogen.sh
+./configure
+make
+sudo make install
+sudo ldconfig
+
+sudo curl -o /usr/local/share/tessdata/eng.traineddata https://github.com/tesseract-ocr/tessdata/raw/main/eng.traineddata
+
+

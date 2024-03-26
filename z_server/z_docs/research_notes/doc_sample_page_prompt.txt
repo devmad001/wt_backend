@@ -1,0 +1,82 @@
+   Please retrieve details about the transactions from the following bank statement page.
+    If you cannot find the information from this text then return "".  Do not make things up. Always return your response as a valid json (no single quotes).
+    - Include any section heads (ie/ ATM & DEBIT CARD WITHDRAWLS, CASH TRANSACTIONS, ELECTRONIC WITHDRAWALS, etc)
+    - Format the transaction_date as yyyy-mm-dd
+    - The transaction_description should include the address and be fully descriptive (it may be multi-line)
+   - Note: "section":"Transaction history" is not valid. Infer the section from the likely headings: Deposits and Additions or Withdrawals and Subtractions
+   - Note:  The year is likely: 2020 So, 04/20  -->  2020-04-20
+    All the transactions should be included in a valid JSON list:
+
+    {"all_transactions": [{"transaction_description": "full description", "transaction_amount": 123.45, "transaction_date": "2021-01-01", "section": "Cash transactions"}]}
+
+    Bank Statement Page:
+    =====================
+
+
+(text char length: 3541)
+[d3]  full_prompt: March 6, 2020 ¦ Page 2 of 5
+Transaction history
+Check    Deposits/      Withdrawals/    Ending daily
+Date     Number Description      Additions       Subtractions    balance
+2/10     Bill Pay American Express Platinum Card Mobile          9,000.00
+xxxxxxxxxx91018 on 02-10
+2/10     ATM Withdrawal authorized on 02/10 12172 Highway 92     300.00          34,781.43
+Woodstock GA 0007638 ATM ID 6935B Card 9916
+2/11     Bill Pay Albert Smith Recurring No Account Number on 02-11      150.00
+2/11     Bill Pay State Farm Bank - Credit Card on-Line Xxxxxxxxxxx77023         324.09
+on 02-11
+2/11     Bill Pay American Express Platinum Card Mobile          7,500.00        26,807.34
+xxxxxxxxxx91018 on 02-11
+2/12     Bill Pay Nbsc - A Division of Synovus Ban on-Line xxxxxx16350 on        1,000.00
+02-12
+2/12     Bill Pay American Express Platinum Card Mobile          6,000.00        19,807.34
+xxxxxxxxxx91018 on 02-12
+2/13     Bill Pay Elan on-Line Xxxxxxxxxxx39510 on 02-13         21.57
+2/13     Bill Pay Tjx Rewards on-Line Xxxxxxxxxxx21275 on 02-13          81.57
+2/13     Bill Pay Citi Cards on-Line Xxxxxxxxxxx58749 on 02-13   103.88
+2/13     Bill Pay Pennymac Loan Services on-Line xxxxx66083 on 02-13     1,000.00
+2/13     Bill Pay Fidelity Lion Card on-Line Xxxxxxxxxxx82029 on 02-13   1,000.00
+2/13     Bill Pay Pennymac Loan Services on-Line xxxxx15074 on 02-13     1,200.00
+2/13     Bill Pay Cenlar FSB on-Line xxxxx75584 on 02-13         1,800.00
+2/13     Bill Pay American Express Platinum Card Mobile          5,000.00        9,600.32
+xxxxxxxxxx91018 on 02-13
+2/14     ATM Check Deposit on 02/14 12172 Highway 92 Woodstock GA        3,500.00
+0008888 ATM ID 6935B Card 9916
+2/14     Bill Pay Barclays Bank Delaware - Credit on-Line        100.00          13,000.32
+Xxxxxxxxxxx61517 on 02-14
+2/18     Bill Pay Citi Cards on-Line Xxxxxxxxxxx58749 on 02-18   408.10
+2/18     322 Check       142.00          12,450.22
+2/19     ATM Check Deposit on 02/19 12172 Highway 92 Woodstock GA        11,461.54
+0002063 ATM ID 6935C Card 9916
+2/19     Bill Pay Td Bank, NA on-Line Xxxxxxxxxxx74331 on 02-19          132.59
+2/19     Bill Pay American Express Platinum Card Mobile          2,500.00
+xxxxxxxxxx91018 on 02-19
+2/19     Etransfer IN Branch/Store - to Checking 12172 Highway 92        1,500.00
+Woodstock GA 4511
+2/19     ATM Withdrawal authorized on 02/19 12172 Highway 92     300.00
+Woodstock GA 0002064 ATM ID 6935C Card 9916
+2/19     323 Check       87.95   19,391.22
+2/20     Venmo Cashout 3136419852 Jonathan Mikula        726.00
+2/20     Common Sense Pub EDI Pymnts 0000351204 Jonathan William         3,092.58
+Mikul
+2/20     Bill Pay T-Mobile -Not for Prepaid Plans on-Line xxxx66628 on   109.98
+02-20
+2/20     Bill Pay Fidelity Card on-Line Xxxxxxxxxxx77603 on 02-20        1,000.00
+2/20     325 Check       553.25
+2/20     ^ 321 TDS Telecommunic Checkpymt 021920 00321 3651      118.96          21,427.61
+2/21     Deposited Item Retn Unpaid - Paper 200221       3,324.08
+2/21     Bill Pay Cherokee County Water & Sewage A on-Line xxxxx70711    53.50
+on 02-21
+2/21     Bill Pay Amex Hilton Honors on-Line xxxxxxxxxx91005 on 02-21    3,118.53
+2/21     Bill Pay American Express on-Line xxxxxxxxxx41005 on 02-21      5,000.00        9,931.50
+2/24     Money Transfer authorized on 02/24 From Zel*Marius Z Braun      165.00
+GA S00460055821140732 Card 9916
+2/24     Purchase authorized on 02/20 Invisus, LLC 801-7246211 UT        42.99
+S460052226239168 Card 9916
+2/24     Cardmember Serv Web Pymt 200222 ***********7603         83.00   9,970.51
+Mikula,Jonathan W 29
+2/25     ATM Check Deposit on 02/25 12172 Highway 92 Woodstock GA        38.00
+0002021 ATM ID 6935B Card 9916
+2/25     Bill Pay Cobb Emc on-Line xxxx87003 on 02-25    156.00
+
+[choose gpt-4 because complex page]

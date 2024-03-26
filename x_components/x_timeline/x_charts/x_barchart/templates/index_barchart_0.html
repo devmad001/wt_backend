@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X BARCHART</title>
+    <style>
+        svg text {
+            transition: fill-opacity 0.25s ease-out;
+  font-family: "Inter", sans-serif;
+        }
+
+        svg:hover text {
+            fill-opacity: 1;
+        }
+
+        svg {
+            cursor: grab;
+        }
+
+        svg:active {
+            cursor: grabbing;
+        }
+        
+        text {
+  font-family: "Inter", sans-serif;
+}
+
+        .tooltip {
+  position: absolute;
+  text-align: center;
+  width: auto;
+  max-width: 200px;
+  height: auto;
+  padding: 2px;
+  font: 12px sans-serif;
+  background: lightsteelblue;
+  border: 0px;
+  border-radius: 8px;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+
+    </style>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://d3js.org/d3-force.v2.min.js"></script>
+</head>
+
+<body>
+    
+    <script>
+
+var fData = 
+
+[{"orders":"A","Total_Orders":76,"A_Lines":123,"B_Lines":0,"C_Lines":0,"D_Lines":0,"Total_Lines":123,"Total_Units":3267},
+{"orders":"B","Total_Orders":68,"A_Lines":0,"B_Lines":107,"C_Lines":0,"D_Lines":0,"Total_Lines":107,"Total_Units":3115},
+{"orders":"C","Total_Orders":81,"A_Lines":0,"B_Lines":0,"C_Lines":123,"D_Lines":0,"Total_Lines":123,"Total_Units":3690},
+{"orders":"D","Total_Orders":113,"A_Lines":0,"B_Lines":0,"C_Lines":0,"D_Lines":203,"Total_Lines":203,"Total_Units":7863},
+{"orders":"AB","Total_Orders":62,"A_Lines":70,"B_Lines":76,"C_Lines":0,"D_Lines":0,"Total_Lines":146,"Total_Units":1739},
+{"orders":"AC","Total_Orders":64,"A_Lines":77,"B_Lines":0,"C_Lines":79,"D_Lines":0,"Total_Lines":156,"Total_Units":2027},
+{"orders":"AD","Total_Orders":100,"A_Lines":127,"B_Lines":0,"C_Lines":0,"D_Lines":144,"Total_Lines":271,"Total_Units":6467},
+{"orders":"BC","Total_Orders":64,"A_Lines":0,"B_Lines":80,"C_Lines":84,"D_Lines":0,"Total_Lines":164,"Total_Units":1845},
+{"orders":"BD","Total_Orders":91,"A_Lines":0,"B_Lines":108,"C_Lines":0,"D_Lines":135,"Total_Lines":243,"Total_Units":4061},
+{"orders":"CD","Total_Orders":111,"A_Lines":0,"B_Lines":0,"C_Lines":132,"D_Lines":147,"Total_Lines":279,"Total_Units":5011},
+{"orders":"ABC","Total_Orders":45,"A_Lines":58,"B_Lines":63,"C_Lines":55,"D_Lines":0,"Total_Lines":176,"Total_Units":1245},
+{"orders":"ABD","Total_Orders":69,"A_Lines":105,"B_Lines":87,"C_Lines":0,"D_Lines":116,"Total_Lines":308,"Total_Units":4538},
+{"orders":"ACD","Total_Orders":66,"A_Lines":91,"B_Lines":0,"C_Lines":88,"D_Lines":132,"Total_Lines":311,"Total_Units":4446},
+{"orders":"BCD","Total_Orders":68,"A_Lines":0,"B_Lines":84,"C_Lines":95,"D_Lines":111,"Total_Lines":290,"Total_Units":4187},
+{"orders":"ABCD","Total_Orders":56,"A_Lines":96,"B_Lines":90,"C_Lines":93,"D_Lines":143,"Total_Lines":422,"Total_Units":6331}] 
+
+        
+var margin = { top: 20, right: 20, bottom: 50, left: 40 },
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var headers = ["A_Lines", "B_Lines", "C_Lines", "D_Lines"];
+var colors = ["#9999CC", "#F7A35C", "#99CC99", "#CCCC99"];
+var colorScale = d3.scaleOrdinal()
+                   .domain(headers)
+                   .range(colors);
+
+// Process the data
+var stackKeys = headers;
+var stack = d3.stack().keys(stackKeys);
+var layers = stack(fData);
+
+// Set x, y and colors
+var xScale = d3.scaleBand()
+    .domain(fData.map(function(d) { return d.orders; }))
+    .rangeRound([0, width])
+    .padding(0.1);
+
+var y = d3.scaleLinear()
+    .domain([0, d3.max(layers, layer => d3.max(layer, d => d[0] + d[1]))])
+    .nice()
+    .range([height, 0]);
+
+// Define and draw axes
+var xAxis = d3.axisBottom(xScale);
+var yAxis = d3.axisLeft(y).tickFormat(d3.format("d"));
+
+// Add the x Axis
+svg.append("g")
+   .attr("transform", "translate(0," + height + ")")
+   .call(xAxis);
+
+// Add the y Axis
+svg.append("g")
+   .call(yAxis);
+
+// Add one group for each row of data
+var groups = svg.selectAll("g.cost")
+   .data(layers)
+   .enter().append("g")
+   .attr("class", "cost")
+   .style("fill", function(d, i) { return colors[i]; });
+
+// Add a rect for each data value
+var rects = groups.selectAll("rect")
+   .data(function(d) { return d; })
+   .enter().append("rect")
+   .attr("x", function(d) { return xScale(d.data.orders); })
+   .attr("y", function(d) { return y(d[1]); })
+   .attr("height", function(d) { return y(d[0]) - y(d[1]); })
+   .attr("width", xScale.bandwidth());
+
+
+// Optionally add a legend
+var legend_upper = svg.selectAll(".legend")
+    .data(headers)
+  .enter().append("g")
+    .attr("class", "legend_upper")
+    .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; })
+    .style("display", "none"); 
+
+legend_upper.append("rect")
+    .attr("x", width - 18)
+    .attr("width", 18)
+    .attr("height", 18)
+    .style("fill", colorScale);
+
+legend_upper.append("text")
+    .attr("x", width - 24)
+    .attr("y", 9)
+    .attr("dy", ".35em")
+    .style("text-anchor", "end")
+    .text(function(d) { return d; });
+
+        // UNDER LEGEND LAYOUT
+        var legendPadding = 5; // Space between legend items
+var legendItemWidth = 100; // Estimate width for each legend item, adjust as needed
+
+var legend = svg.selectAll(".legend")
+    .data(headers)
+    .enter().append("g")
+    .attr("class", "legend")
+    // Calculate the horizontal position for each legend item
+    .attr("transform", function(d, i) {
+        // Calculate total width of all legend items
+        var totalLegendWidth = headers.length * legendItemWidth;
+        // Calculate starting position
+        var startPos = width - totalLegendWidth + (legendItemWidth + legendPadding) * i;
+        // Position each legend item starting from the right and going left
+        return "translate(" + startPos + "," + (height + margin.bottom - 20) + ")";
+    });
+
+// Optionally show the legend, if you have set the display to none earlier
+//legend.style("display", null);
+
+legend.append("rect")
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("width", 18)
+    .attr("height", 18)
+    .style("fill", function(d) { return colorScale(d); });
+
+legend.append("text")
+    .attr("x", 24) // Position text to the right of the rectangle
+    .attr("y", 9)
+    .attr("dy", ".35em")
+    .style("text-anchor", "start") // Start-anchor the text so it lines up with the rect
+    .text(function(d) { return d; });
+
+
+
+
+    </script>
+
+    </body>
+    
+    </html>

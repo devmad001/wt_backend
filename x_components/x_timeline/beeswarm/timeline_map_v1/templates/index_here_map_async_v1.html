@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" style="overflow: hidden;">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Map with POIs</title>
+  <link href="https://cdn.jsdelivr.net/npm/maplibre-gl@3.4.0/dist/maplibre-gl.min.css" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+    }
+
+    #map {
+      height: 100vh;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@3.4.0/dist/maplibre-gl.min.js"></script>
+</head>
+
+<body>
+  <div id="map"></div>
+  <script>
+    // 0v1 JC  Dec 1, 2023
+    
+    document.addEventListener('DOMContentLoaded', async function () {
+      // esri
+      const apiKey = "v1.public.eyJqdGkiOiJjZGVmNWRmMi0yNzRiLTRhOWItYmQ1Zi02ZWVkMDBiMDYxMjkifTfg432tsDiP2LK67yuhA1SpI9VKmtpaf3eK1R2HS8cipDAsdQq0RM_lFbdc8m6YYoIfbY7R9Mk5fiM7MhqdIF9Cs_6QIlacVYw6tLQVzyLbWQUQfEHCM8cN8_n7FmA_p7GdWQt4QhIc5e3osa0pFLGUmmrMrDlwOOwsZjHBN2t2SpYKfbWibGcObt9Mb4D-LxXdkfbNlYj-ifjxcHzH_r-b9TCNVFvCn8x0wRth-xmqCIS0CISr_nFwp87-6vPs4aIoXNUz6domUp4xTK_j6HvZixoMU8ADAOvPoucma2bkJCkr-4a7jF0q20acGrdseO6GaYFlp_1_YfkaY-UguDk.ZWU0ZWIzMTktMWRhNi00Mzg0LTllMzYtNzlmMDU3MjRmYTkx";
+      // const mapName = "watchtower_map_here_hybrid";
+      const mapName = "here_explore_neutral";
+      const region = "us-east-1";
+
+      // Function to fetch POIs from the backend
+      let caseId = "{{ case_id }}"; // Get case_id from the Flask variable using Jinja2 syntax
+      let sessionId = "{{ session_id }}"; // Get session_id from the Flask variable using Jinja2 syntax
+
+      // Function to fetch POIs from the backend
+      async function fetchPOIs() {
+        try {
+          const response = await fetch(`/api/v1/case/${caseId}/map/get_pois?case_id=${caseId}&session_id=${sessionId}`); // Using a relative URL with both parameters
+          return await response.json();
+        } catch (error) {
+          console.error('Error fetching POIs:', error);
+          return null;
+        }
+      }
+
+
+      // Initialize the map
+      const map = new maplibregl.Map({
+        container: "map",
+        style: `https://maps.geo.${region}.amazonaws.com/maps/v0/maps/${mapName}/style-descriptor?key=${apiKey}`,
+        center: [-123.115898, 49.295868], // Adjust this center point
+        zoom: 3, // 11 too close, 10 fine for local, 5 is 1/2 US, 3 is US to Europe
+      });
+
+      // Add navigation control
+      map.addControl(new maplibregl.NavigationControl(), "top-left");
+      // When map is loaded, fetch and add POIs
+      // Define a variable for the popup outside of the event listeners
+      var popup = new maplibregl.Popup({
+        closeButton: false,
+        closeOnClick: false
+      });
+
+      // When map is loaded, fetch and add POIs
+      map.on('load', async function () {
+        const poiData = await fetchPOIs();
+        if (poiData && poiData.features.length > 0) {
+          // Add POIs to the map
+          map.addSource('pois', {
+            type: 'geojson',
+            data: poiData
+          });
+          map.addLayer({
+            id: 'pois',
+            type: 'circle',
+            source: 'pois',
+            paint: {
+              'circle-color': '#CD5C5C',
+              'circle-radius': 10,
+              'circle-stroke-width': 1,
+              'circle-stroke-color': '#fff'
+            }
+          });
+
+
+          // Add mouseenter event listener to change cursor and show title on hover
+          map.on('mouseenter', 'pois', function (e) {
+
+            console.log("Hovering over POI", e.features[0]);
+            // Change the cursor style
+            map.getCanvas().style.cursor = 'pointer';
+
+            var coordinates = e.features[0].geometry.coordinates.slice();
+            var title = e.features[0].properties.title;
+            var description = e.features[0].properties.description;
+
+            // Ensure the popup is over the correct POI even when map is zoomed out
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+              coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            }
+
+            // Set the content and location of the popup
+            popup.setLngLat(coordinates)
+              .setHTML('<strong>' + title + '</strong><p>' + description + '</p>') // Set title and description as the popup content
+              .addTo(map);
+
+          });
+
+          // Add mouseleave event listener to revert cursor and remove title
+          map.on('mouseleave', 'pois', function () {
+            map.getCanvas().style.cursor = '';
+            popup.remove(); // Close the popup
+          });
+
+
+          // Calculate the average latitude and longitude from the POIs
+          let avgLat = 0;
+          let avgLng = 0;
+          poiData.features.forEach(feature => {
+            avgLat += feature.geometry.coordinates[1];
+            avgLng += feature.geometry.coordinates[0];
+          });
+          avgLat /= poiData.features.length;
+          avgLng /= poiData.features.length;
+
+          // Smoothly adjust the map's center
+          map.flyTo({ center: [avgLng, avgLat] });
+        }
+      });
+
+    });
+
+
+  </script>
+</body>
+
+</html>

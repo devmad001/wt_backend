@@ -1,0 +1,121 @@
+
+
+"""
+
+#################################################################
+INTEGRATION STEPS
+- Generally, expect back-and-forth refinement as items are address.
+
+
+1)  Endpoint release process
+    - first batch (auth, some chart views, some processing)
+
+2)  AUTH
+- Recall, fin_session_id needs to be passed to ws and individual components.
+[ ] Validate /auth_handshake and /request_for_auth
+
+2)  Normal endpoints
+    - incremental features (see /docs)
+    - (the active 'outstanding' list)
+    - button view, FAQ view
+    
+3)  ws dashboard
+    - Recall, dashboard has 3 main component views (at a time).  Component positions may change, component types may change (Barchart <> Waterfall), Componnet content may change (IFRAMEComponent).  Logic is controlled via ws push details.
+    - get to base component skeleton setup: 3 components.  View table. View waterfall "timeline"
+    - ws updates layout + component parameters
+       ([ ] optional endpoint if want to validate format via get otherwise see below)
+
+
+
+#################################################################
+### NOTES ON ws messages
+
+------------------------------
+CLIENT CONNECTION VIA:
+"get https://core.epventures.co/api/v1/ws?&case_id=...&fin_session_id=...&user_id=..."
+
+------------------------------
+INIT DATA SENT ON REQUEST
+*possible to add get endpoint too if also convenient
+{
+    "action": "init_data",
+    "meta": {
+        "dashboard_types": [
+            "ChatComponent",
+            "TimelineComponent",
+            "SquareComponent",
+            "IFRAMEComponent",
+            "WaterfallComponent",
+            "ButterflyComponent",
+            "BarchartComponent"
+        ],
+        "layout_types": [
+            "view_standard_3",
+            "view_tall_3"
+        ]
+    },
+    "data": {
+        "dsettings": {
+            "layout_type": "view_standard_3",
+            "custom_layout": {}
+        },
+        "components": [
+            {
+                "type": "timeline",
+                "id": "timeline_1",
+                "position": "top_full",
+                "component_name": "TimelineComponent",
+                "src": null
+            },
+            {
+                "type": "square",
+                "id": "square_1",
+                "position": "bottom_right",
+                "component_name": "SquareComponent",
+                "src": null
+            },
+            {
+                "type": "chat",
+                "id": "chat_1",
+                "position": "bottom_left",
+                "component_name": "IFRAMEComponent",
+                "src": "http://core.epventures.com/api/v1/get_chat?case_id=1"
+            }
+        ]
+    }
+}
+
+------------------------------
+SERVER REQUESTS REFRESH OF COMPONENT
+{
+    "action": "request_component_refresh",
+    "data": {
+        "component_id": "timeline_1",
+        "key": "20231130064924408779"
+    }
+}
+
+------------------------------
+SERVER REQUESTS SET IFRAME URL
+{
+    "action": "request_iframe_url",
+    "data": {
+        "component_id": "timeline_1",
+        "iframe_source": "https://core.epventures.com/api/v1/get_chat?case_id=1"
+    }
+}
+
+------------------------------
+CLIENT OPTIONAL REQUEST INIT DATA
+{
+    "action": "request_init_data"
+}
+
+------------------------------
+CLIENT OPTIONAL PING
+{
+    "action": "request_ping"
+}
+
+"""
+

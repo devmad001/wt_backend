@@ -1,0 +1,7 @@
+pikepdf C++ to Python logger bridge initialized
+NumExpr defaulting to 2 threads.
+[] add llm_interfaces test
+[ ] collect source_schema.py into SCHEMA_KBAI or similar
+[assuming threading]=> Separate LLM interfaces (no lazy)
+[] multi not tracking performance stats (pip install psutil)
+Usage: python run_background.py <case_id> <state1>

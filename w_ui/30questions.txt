@@ -1,0 +1,39 @@
+
+1.	What is the Primary account number for bank statement?
+2.	What is the beginning monthly balance? 
+3.	What is the date the Account Opened?
+4.	What are the total deposits and additions? 
+5.	What is the total deposits and additions for the Month? 
+6.	What is the total deposits and additions for the Year? 
+7.	What is the total deposits and additions for the Quarter?
+8.	What is the total deposits and additions for the Day?
+9.	What are the total deposits for the Month? 
+10.	What are the total deposits for the Year?
+11.	What are the total deposits for the Quarter?
+12.	What are the total deposits for the Day? 
+13.	What are the total inflows?
+14.	What is the total number of outflows? (Defined as money going out, so leaving account) 
+15.	What is the total number of outflows via cash withdrawal?
+16.	What is the total number of outflows via check? 
+a.	Make sure if a check is shown twice on statement the amount is not counted twice, so on some bank accounts a check for $500 could be on the statement twice, so verify the check number, of course if it is two different checks for $500 we have to count it twice, but we want to prevent an error if the same check number shows up twice... 
+17.	What is the total number of outflows via credit card payments?
+18.	What is the total number of outflows via Zelle, and what is the ID number?
+19.	What is the total number of outflows via Wire?
+20.	What is the total number of outflows via bank fees?
+21.	What % of the withdrawals are ATM vs debit card?
+a.	 Map locations, times and dates should be on GUI 
+22.	How many electronic withdrawals occurred in total by day, month, year and quarter?
+23.	How many electronic withdrawals occurred by Wire
+24.	How many electronic withdrawals occurred by Zelle, 
+25.	What is the ending balance of the statement by Date?
+a.	Must be able to calculate by each day during the month the ending balance. 
+26.	How many book transfer credits occurred? Between which entity? From which bank? On which date, for how much money? 
+a.	Timeline of account transfers, amount.
+27.	How many Zelle payments were made over the course of the month? Id Accounts sent and received?
+28.	How many Fed Wire credits came in during the month? ID accounts sent and received.
+29.	What is the payment ID on Zelle Transfers?
+a.	These must connect to backend GUI
+30.	List of all companies where monies were sent and received?
+31.	List of all banks and amounts sent and received?
+32.	Top ATM used, Top bank used, Top Loan accounts, Top Credit Card Accounts
+a.	Top 1 – 10 individuals, entities by transfer types, number of transfers, dollar amount, locations where are they being sent from. 
