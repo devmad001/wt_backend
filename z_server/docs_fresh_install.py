@@ -82,21 +82,14 @@ def special_libraries():
     """
         Failed building wheel for PyMuPDF
 
-
-
-    """
-
-    """
     ocrmypdf
     ** requires latest version but also latest tesseract data files!
     
     #    sudo apt-get update
     #    sudo apt-get -y install ocrmypdf python3-pip
     #    pip install --user --upgrade ocrmypdf
-    #    """
     #
     #    ## WINDOWS:
-    #    """
     #    powershell.exe   *may have already
     #    choco to test
     #    https://chocolatey.org/install

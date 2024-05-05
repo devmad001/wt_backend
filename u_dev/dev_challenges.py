@@ -394,18 +394,76 @@ def run_single_full_challenge():
 
     case_id='65a7ec01ac045a667c77c92b' #Pjp
 
-<<<<<<< HEAD
     case_id='65c64ee590657f5b87e92666'
     case_id='65ccf25e9b6ff316a77a15bf' #M business
     case_id='65cd01899b6ff316a77a1988'
     case_id='65caaffb9b6ff316a779f525' #ashford_park_1'
     case_id='65cd01cd9b6ff316a77a19db' # check fraud?
-=======
 
-    case_id='65caaffb9b6ff316a779f525' #ashford_park_1' Hogan
->>>>>>> origin/main
+    case_id='65caaffb9b6ff316a779f525' #ashford_park_1' Hogan LARGE NO DEL
 
-#noash    local_admin_remove_case_from_kb(case_id=case_id)
+
+    case_id='65cd06669b6ff316a77a1d21'  #TD redacted also long.
+
+    case_id='65cd06669b6ff316a77a1d21_TDlean' #<-- requires OCR!
+
+
+    case_id='65ca5aed9b6ff316a779e928_local' #Bad pdf?
+    
+    case_id='65ca5aed9b6ff316a779e928'   #Reprocess for pdf viewer (jon)
+
+    case_id='6596f679c8fca0cb7b70e1fb' # New age redo kept timing out never worked
+
+    case_id='65cbb7ac9b6ff316a779fac0' #Colin case 1-50 as deposit and weirds. [x] good
+    case_id='65d65ae49be7358de5d1fb89' #James case. has dup node (2 statements ok. also, refined hallucination likely.)
+
+    case_id='65960931c8fca0cb7b70e024' #123.45 case evan dad [ ] has bad check debit/credit
+
+    case_id='65d11a8c04aa75114767637a_silent_1page' # azure ocr test
+    case_id='65d11a8c04aa75114767637a' # Silent pipe entire with azure (no force gpt4 but 3.5 misses single column outputs)
+
+    case_id='6596f679c8fca0cb7b70e1fb' #Evan main New Age demo but local possible to run?
+
+    case_id='65960931c8fca0cb7b70e024' # still has bad check debit but not on single retest. redo mar 19
+
+    case_id='65f9a28a7a047045e56b4df1' #Affinity...just don't do ocr
+    case_id='65fa72717a047045e56b54bb'  #Test case odd debit on reversal
+    
+
+    case_id='affinity2pageoddyear'
+    case_id='65f5d2d87a047045e56b3da0' #Chase Statements 2 but still on server so want clean view better dates
+    
+    ## Rerun old colin FirstCitizenBank case with 300 dpi and new setup (mar vs oct)
+    case_id='ColinFCB1'
+
+    ## JON TO RUN
+    case_id='660446437a047045e56b7970'  #Short ok and viewable Done first 5pm 27th..
+    
+    case_id='65ca54869b6ff316a779e6d5' #many COLIN!
+
+    case_id='660467cb7a047045e56b81e9'
+    case_id='6603074b7a047045e56b730a'
+    case_id='6604682d7a047045e56b823d'
+    case_id='660445557a047045e56b7847'
+    case_id='65caaffb9b6ff316a779f525'
+    case_id='65cd01899b6ff316a77a1988'
+    case_id='6602ebdb7a047045e56b71e0'
+    case_id='66046a277a047045e56b82a4'
+    case_id='66046d277a047045e56b82eb'
+    case_id='66047d2b7a047045e56b8374'
+
+    case_id='660446e97a047045e56b79c9' #optimza 2/4  started
+    case_id='6604467c7a047045e56b7989' # 6604467c7a047045e56b7989 --> {'name': 'Sample bank statement__Chase - Test 3'
+    case_id='660445ab7a047045e56b78c5' # 660445ab7a047045e56b78c5 --> {'name': 'Test 1',  started
+
+    case_id='660446437a047045e56b7970' # DOD
+    case_id='660445557a047045e56b7847' # Manual req
+
+
+
+    options['force_ocr']=False
+
+    local_admin_remove_case_from_kb(case_id=case_id)
 
     
     get_job_state(case_id=case_id) #WILL ALSO SYNC

@@ -43,10 +43,14 @@ SMARTEST_MODEL_NAME=Config.get('performance','smartest_llm_name')
 BANKS_SCHEMA=dev_get_bank_schema()
 
 
-def force_manual_page_fixes(page_text,year=''):
+def force_manual_page_fixes(page_text,year='',statement_date='',statement_period=''):
     ##[A]  AUTO EXTEND (include) Year
     ##[B]  APPLY regex from schema_statement_kinds
     global BANKS_SCHEMA
+    
+    ## PARAMS
+    # statement_date:  2023-12-31  from ptr usually first date in statement from
+    # statement_period ? formalized format or 2023-12-01 to 2023-12-31 generally
 
     ## Case FCB OCR has too many OCR errors to extract all check numbers so infer date and do auto swap where possible
     ## ASSUMPTION AT FCB
@@ -61,7 +65,8 @@ def force_manual_page_fixes(page_text,year=''):
     [ ] watch because first cell is missing check no so will miss adding this date as well
     """
     
-    year=alg_get_page_year(page_text)
+    if not year:
+        year=alg_get_page_year(page_text,statement_date=statement_date)
 
     logging.info("[generic year extract] as : "+str(year))
     
@@ -70,11 +75,12 @@ def force_manual_page_fixes(page_text,year=''):
     
     if re.search(r'\bCHASE',page_text) and year:
         #mm/dd --> yyyy/mm/dd
-        page_text=re.sub(r'\b(\d\d\/\d\d)\b',year+"/"+r"\1",page_text)
+        page_text=re.sub(r'\b(\d\d\/\d\d)\b',str(year)+"/"+r"\1",page_text)
 
     ## 102#  Chase year adjust
     if 'Checks Paid From Your Account' in page_text:
-        year=alg_get_page_year(page_text)
+        if not year:
+            year=alg_get_page_year(page_text)
         if year:
             ## Do double rather then look back
             
@@ -236,10 +242,17 @@ def estimate_number_of_transactions_on_page(page_text):
         boa_ref_counts=len(re.findall(r'\b[\d]{15}\b',page_text))
     else:
         boa_ref_counts=0
-    
+        
     estimated_transactions=max(fargo_matching_rows,max_chase,max_fcb,boa_ref_counts)
+    
+    ## SPECIAL CASES:  if bad pdf2txt may have 1 column of transaction details so look for ^\d\d/\d\d$
+    #> ie/ wells fargo silent pipe 
+    if estimated_transactions==0:
+        all_only_dates=re.findall(r'^\d\d\/\d\d\b',page_text,flags=re.M)
+        if all_only_dates:
+            estimated_transactions=len(all_only_dates)
+            logging.info("[special case estimated_transactions on page] "+str(estimated_transactions))
 
-    logging.info("[estimated_transactions on page] "+str(estimated_transactions))
     return estimated_transactions
 
 
@@ -321,9 +334,33 @@ def dev_test_auto_clean():
     
     return
 
+def test_count():
+    blob="""te
+Amount
+Transaction detail
+02/08
+ 43,000.00
+Online Transfer to Autonomous Inc. Commercial Business Checking xxxxxx8464
+Ref #1b0Djyzh6L on 02/08/22
+02/08
+ 412,167.77 < Business to Business ACH Debit - Brex Inc. Payments 220206 Brexi7WrqfdwOF
+NTE*ZZZ*Brex Card Payment\
+02/08
+ 101,961.53 < Business to Business ACH Debit - Brex Inc. Payments 220205 Brexi7Wqknhlim
+NTE*ZZZ*Brex Card Payment\
+02/08
+ 26,363.06 < Business to Business ACH Debit - TX Comptroller Tax Pymt 05059764/20207
+33311/12345/EDI/Xml -
+02/08
+    """
+    est=estimate_number_of_transactions_on_page(blob)
+    
+    return
+
 
 if __name__=='__main__':
     branches=['dev_test_auto_clean']
+    branches=['test_count']
     for b in branches:
         globals()[b]()
 

@@ -174,7 +174,7 @@ def dev_entry():
         auto_redo_markup_for_a_single_transaction(case_id)
 
     if 'do_questions' in b:
-        print ("[x] migrated to stand_alone_functional_tests"")
+        print ("[x] migrated to stand_alone_functional_tests")
         Bot=Bot_Interface()
         Bot.set_case_id(case_id)
         

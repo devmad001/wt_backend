@@ -107,7 +107,7 @@ def normal_start_standard():
     pname='fast_main'
     is_process_running=Admin.is_process_running(pname)
     if not is_process_running:
-        run_cmd='cd '+LOCAL_PATH+"../z_apiengine && python -m uvicorn fast_main:app --port 8008 --workers 3"
+        run_cmd='cd '+LOCAL_PATH+"../z_apiengine && python -m uvicorn fast_main:app --port 8008 --workers 8"
         log_name=re.sub(r'\..*','',pname)+".log"
         print ("==== SPAWNING: 3 workers!  "+str(run_cmd))
         Admin.spawn_process(run_cmd,log_name=log_name)
@@ -167,7 +167,7 @@ def force_auto_restart_server_endpoint():
     print ("IS FAST MAIN RUNNING?: "+str(is_process_running)+" at: "+str(pname))
     if True or not is_process_running:
         #b4 Feb22# run_cmd='cd '+LOCAL_PATH+"../z_apiengine && python -m uvicorn fast_main:app --port 8008 --workers 3"
-        run_cmd='cd '+LOCAL_PATH+"../z_apiengine && python -m uvicorn fast_main:app --port 8008 --workers 3"
+        run_cmd='cd '+LOCAL_PATH+"../z_apiengine && python -m uvicorn fast_main:app --port 8008 --workers 8"
         log_name=re.sub(r'\..*','',pname)+".log"
 
         print ("==== SPAWNING: 10 workers! using command: "+str(run_cmd))

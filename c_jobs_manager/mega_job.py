@@ -35,6 +35,7 @@ ON_SERVER=am_i_on_server()
 #  self.states = ["RUNNING", "PENDING", "DONE", "ERROR","REQUESTED"]
 
 
+#0v4# JC  Mar 27, 2024  Manual force requeue jobs
 #0v3# JC  Jan 13, 2024  Basic test at test_job_case_queues.py
 #0v2# JC  Dec 13, 2023  Track machine performance prior to spawn
 #0v1# JC  Dec 10, 2023  To-the-point runner
@@ -106,11 +107,13 @@ class Mega_Jobber:
         ## Assume all checks down
         
         #0) Get job object
-        job_instance=self.Manager.query_jobs(query={'case_id':case_id})[0] #many?
-        
+        # job_instance=self.Manager.query_jobs(query={'case_id':case_id})[0] #many?
+        job_instance = self.Manager.peek_next_job_to_run(case_id)
+
         #[ ] final check multiple, check state, etc.
         
-        if not job_instance.status=='RUNNING':
+        # if not job_instance.status=='RUNNING':
+        if job_instance:
             #1)  run
             self.MInterface.start_long_running_job_process_in_background(case_id)
 
@@ -638,6 +641,38 @@ def practical_requeue_error_runs():
     return actions
 
 
+def practical_manual_job_run():
+    # March 27
+    """
+    -rw-rw-r-- 1 ubuntu ubuntu 1629 Mar 27 18:10 exe1_660446437a047045e56b7970_2024_03_27_18_10.log
+
+    -rw-rw-r-- 1 ubuntu ubuntu 1621 Mar 27 18:04 exe1_6602ebdb7a047045e56b71e0_2024_03_27_18_04.log
+    -rw-rw-r-- 1 ubuntu ubuntu 1621 Mar 27 18:06 exe1_6603074b7a047045e56b730a_2024_03_27_18_06.log
+    -rw-rw-r-- 1 ubuntu ubuntu 1621 Mar 27 18:07 exe1_660445557a047045e56b7847_2024_03_27_18_07.log
+    -rw-rw-r-- 1 ubuntu ubuntu 1629 Mar 27 18:08 exe1_660445ab7a047045e56b78c5_2024_03_27_18_08.log
+    -rw-rw-r-- 1 ubuntu ubuntu 1629 Mar 27 18:11 exe1_6604467c7a047045e56b7989_2024_03_27_18_11.log
+    -rw-rw-r-- 1 ubuntu ubuntu 1629 Mar 27 18:12 exe1_660446e97a047045e56b79c9_2024_03_27_18_12.log
+    """
+
+    case_ids=[]
+    case_ids+=['660446437a047045e56b7970']
+
+    MJ=Mega_Jobber()
+    for Job in MJ.iter_jobs():
+
+        ### STATE
+        job_dict=Job.to_dict()
+        print ("[STATE]: "+str(job_dict))
+        if job_dict['case_id'] in case_ids:
+#            print ("[REQUEUE FOR STATE]: "+str(job_dict))
+
+            if job_dict.get('status','')=='ERROR': pass
+
+#            a=kkkk
+#            MJ.Manager.update_job_status(job_dict['id'],status='REQUESTED')
+
+    return
+
 
 def dev_state_and_resources():
     MJ=Mega_Jobber()
@@ -718,6 +753,8 @@ if __name__=='__main__':
     branches=['local_echo_job_queue_status']
 
     branches=['interface_run_one_job_cycle']
+
+    branches=['practical_manual_job_run']
     
 
     for b in branches:

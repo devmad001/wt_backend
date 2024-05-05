@@ -103,9 +103,11 @@ app.add_middleware(
         "http://3.134.162.56",
         "http://3.20.195.157",
         'http://18.118.67.255',
+        'http://3.131.56.150',
         "https://3.134.162.56",
         "https://3.20.195.157",
-        'https://18.118.67.255',    
+        'https://18.118.67.255',
+        "https://watchdemo.epventures.co",
         "https://watchdev.epventures.co",
         "https://watch.epventures.co",
         "https://nets.epventures.co"

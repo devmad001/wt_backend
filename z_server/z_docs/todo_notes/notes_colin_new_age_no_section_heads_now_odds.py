@@ -1,3 +1,4 @@
+"""
 COLIN NEW AGE
 [1] add back transactions below??
 [2] consider adding absolute cleaner to transactions based on jon fix.
@@ -80,3 +81,4 @@ DELETE: {'is_credit': True, 'transaction_date': '2021-01-27', 'filename_page_num
 Transaction and its relationships deleted successfully
 DELETE: {'is_credit': True, 'transaction_date': '2021-01-28', 'filename_page_num': 15, 'account_number': '334049185630', 'transaction_amount': 27275.0, 'section': 'Deposits and other credits', 'label': 'Transaction', 'transaction_method': 'other', 'statement_id': '6596f679c8fca0cb7b70e1fb-2021-01-01-334049185630-b584defb-db9a-42da-b612-f5a5dc9b47c2.pdf', 'transaction_type': 'deposit', 'transaction_description': 'MERCHANT BNKCD DES:DEPOSIT 1D:323242463996 INDN:PLANET SMOOTHIE 19109 CO 27275 | ID:1113111249 CCD', 'algList': ['create_ERS'], 'account_id': '6596f679c8fca0cb7b70e1fb-334049185630', 'filename': 'b584defb-db9a-42da-b612-f5a5dc9b47c2.pdf', 'case_id': '6596f679c8fca0cb7b70e1fb', 'versions_metadata': '{"transaction_method": "llm_markup-transaction_type_method_goals-", "transaction_method_id": "llm_markup-transaction_type_method_goals-", "transaction_type": "llm_markup-transaction_type_method_goals-"}', 'id': 'e3041c17aa1e5c4c7391f8863808893547101e59887b05f86576175b67f07fe5', 'transaction_method_id': '1113111249'}
 
+"""

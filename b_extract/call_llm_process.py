@@ -152,7 +152,7 @@ def call_transaction_processing_pipeline(epage={},filename_path='',input_filenam
             # CORE LLM ENTRY
             #- assuming not skip because no transaction page, and not wells fargo found above faster
             logging.info('[calling llm_page2transactions]')
-            transactions,meta_page2t=llm_page2transactions(page_text='',epage=epage,verbose=verbose_transaction_dicts, doc_dict={},bank_name=ptr.get('bank_name',''),try_cache=allow_cache)
+            transactions,meta_page2t=llm_page2transactions(page_text='',epage=epage,verbose=verbose_transaction_dicts, doc_dict=doc_dict,bank_name=ptr.get('bank_name',''),try_cache=allow_cache,ptr=ptr)
 
 
     else:

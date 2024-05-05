@@ -37,7 +37,8 @@ def execute_in_background_case_id(case_id, method):
 
     end_time=time.time()-start_time
     logging.info("execute in background runtime: "+str(end_time))
-
+    print("@@@")
+    print(end_time)
     return
 
 

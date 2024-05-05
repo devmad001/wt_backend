@@ -56,16 +56,27 @@ def dev1():
 #https://core.epventures.co/api/v1/case/657f172f9a57063d991dd88b/pdf/6fcac963-a70f-4edc-a386-5d8b98ef0832.pdf?page=151&key=800e70fb9829c74a3fbefdc1553cf2f9a2936cba4bc95b5824d0a6bfeb49569d
 #https://watchdev.epventures.co/fin-aware/dashboard?case_id=657f172f9a57063d991dd88b
 
-def dev_year_2028_fix():
+def dev_year_fix():
+    from a_query.queryset1 import delete_transaction_node
     case_id = '657f172f9a57063d991dd88b'
+    case_id = '65caaffb9b6ff316a779f525'
+    case_id = '65faee287a047045e56b57ef'# https://core.epventures.co/api/v1/case/65faee287a047045e56b57ef/pdf/2c8dec16-53f6-44f8-b3a9-938b07af376f.pdf?page=85&key=12048d4db68d1b9e93d1de248a16b023043a42483f8e10a53115695b0879c9fc&highlight=99.50|877-6504249|Payment|Inmate
+
 
     # Query to find and update transactions
     update_stmt = """
         MATCH (n:Transaction)
         WHERE n.case_id='{}' AND n.transaction_date>'2025-01-01'
-        SET n.transaction_date = REPLACE(n.transaction_date, '2028', '2021')
+        SET n.transaction_date = REPLACE(n.transaction_date, '2000', '2023')
+        SET n.transaction_date = REPLACE(n.transaction_date, '2028', '2022')
         RETURN n
     """.format(case_id)
+
+#    update_stmt = """
+#        MATCH (n:Transaction)
+#        WHERE n.case_id='{}' AND n.transaction_date<'2016-01-01'
+#        RETURN n
+#    """.format(case_id)
 
     print("UPDATE QUERY: " + update_stmt)
 
@@ -74,6 +85,8 @@ def dev_year_2028_fix():
     for record in Neo.iter_stmt(update_stmt, verbose=False):
         record = record[0]  # Assuming the result is a list
         print("> " + str(record))
+        raise Exception("STOPPED no del")
+        delete_transaction_node(transaction_id=record['id'])
 
     return
 
@@ -598,9 +611,65 @@ def dev_start_formal_log():
 
     return
 
+def dev_fix_template():
+    from a_query.queryset1 import delete_transaction_node
+
+    #    from a_query.queryset1 import delete_transaction_node
+
+
+    # Query to find and update transactions
+    
+    ############################################################################
+    #  ALL MANUAL FIXES MUST BE REGISTERED AS FEEDBACK ISSUES IN ONLINE DOC!
+    ############################################################################
+    #
+    
+    ALLOW_DELETE=False
+    
+    if 'case study nav one 44' in []:
+        case_id = '65a8168eb3ac164610ea5bc2'
+        #                n.section='Electronic Withdrawals' AND
+        update_stmt = """
+            MATCH (n:Transaction)
+            WHERE n.case_id='{}' AND
+                n.transaction_amount=44685.35 AND
+                n.is_credit=False
+            SET n.is_credit=True
+
+            RETURN n
+        """.format(case_id)
+#            SET n.transaction_date = REPLACE(n.transaction_date, '2000', '2023')
+#            SET n.transaction_date = REPLACE(n.transaction_date, '2028', '2022')
+
+    if True or 'std finaware applied to check pages --beyond design --' in []:
+
+        ALLOW_DELETE=True
+        case_id = '65f5d2d87a047045e56b3da0'
+
+        update_stmt = """
+            MATCH (n:Transaction)
+            WHERE n.case_id='{}' AND
+                n.transaction_date>'2023-01-01'
+            RETURN n
+        """.format(case_id)
+
+
+
+    print("UPDATE QUERY: " + update_stmt)
+
+    for record in Neo.iter_stmt(update_stmt, verbose=False):
+        record = record[0]  # Assuming the result is a list
+        print("> " + str(record))
+
+        if ALLOW_DELETE:
+            delete_transaction_node(transaction_id=record['id'])
+
+    return
+
+
+    return
 
 if __name__=='__main__':
-    branches=['dev_year_2028_fix']
     branches=['dev1']
     branches=['dev_one_no_period']
     
@@ -622,6 +691,8 @@ if __name__=='__main__':
 
     branches=['dev_manual_patch_bad_date']
     branches=['dev_start_formal_log']
+    branches=['dev_year_fix']
+    branches=['dev_fix_template']
 
     for b in branches:
         globals()[b]()

@@ -55,12 +55,12 @@ async def serve_jpg_image(case_id: str, check_identifier: str, response: Respons
     ## Get check from Checks db image_bytes field via x_modules/k_checks via service
     if check_identifier:
         check_image_bytes,check_image_filename,meta=get_check_image_meta_image(check_identifier)
-        print ("[debug] check image size: "+str(len(check_image_bytes)))
-        print ("[debug] check image filename: "+str(check_image_filename))
-        
-        safe_filename = quote(check_image_filename, safe='')
 
         if check_image_bytes:
+            print ("[debug] check image size: "+str(len(check_image_bytes)))
+            print ("[debug] check image filename: "+str(check_image_filename))
+            safe_filename = quote(check_image_filename, safe='')
+
             return Response(check_image_bytes, media_type="image/jpeg", headers={"Content-Disposition": f"inline; filename=\"{safe_filename}\""})
         
     return {"error":"check image not found"}

@@ -3,7 +3,7 @@ import boto3
 import time
 
 # Explicit AWS credentials (OPTIONAL: Only if not using environment variables or AWS CLI configuration)
-AWS_ACCESS_KEY = 'AXXXXXXXXXXXXXXXXXXXXX
+AWS_ACCESS_KEY = 'AXXXXXXXXXXXXXXXXXXXXX'
 AWS_SECRET_KEY = 'a6oaXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/hj'
 os.environ["AWS_ACCESS_KEY_ID"] = AWS_ACCESS_KEY
 os.environ["AWS_SECRET_ACCESS_KEY"] = AWS_SECRET_KEY

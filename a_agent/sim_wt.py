@@ -19,11 +19,15 @@ from modules_hub import TASK_run_main_pipeline
 from modules_hub import TASK_call_KB_update_pipeline
 from modules_hub import TASK_dump_excel
 
+from global_routes import get_global_routes
+
 from get_logger import setup_logging
 
 logging=setup_logging()
 
 
+#0v4# JC  Mar 20, 2024  Add global config modes
+#0v3# JC  Mar  1, 2024  Turn off force OCR (see pdf2txt check etc)
 #0v2# JC  Dec 10, 2023  Tie into front end + file sync
 #0v1# JC  Sep 19, 2023  Init
 
@@ -37,14 +41,19 @@ FILENAME_RUN_LOG=LOCAL_PATH+"../w_datasets/run_logs/run_logs.jsonl"
 """
 
 ## Ideally move to file but for larger assumptions:
-GLOBAL_PIPELINE_CONFIG={}
-GLOBAL_PIPELINE_CONFIG['force_ocr']=True
-logging.info("[debug]  GLOBAL pipeline force ocr: "+str(GLOBAL_PIPELINE_CONFIG['force_ocr']))
+
+## Top level config
+GLOBAL_ROUTES=get_global_routes()
+logging.info("[debug]  GLOBAL pipeline config (sample) force ocr preprocess: "+str(GLOBAL_ROUTES['global_config']['force_ocr_preprocess']))
 
 
 def get_standard_job_needs(options={}):
-    global GLOBAL_PIPELINE_CONFIG
+    global GLOBAL_ROUTES
     caps={}
+    
+    #> Force OCR on all files prior to processing?
+    caps['ocr_conversion_force']=False
+
     caps['download_cloud_case_files']=False
 
     caps['create_run_job']=False
@@ -68,7 +77,7 @@ def get_standard_job_needs(options={}):
     #TODO#    caps['pdf_viewer_cached']=False
 
     ## Control top options
-    if options.get('force_ocr',False) or GLOBAL_PIPELINE_CONFIG.get('force_ocr',False):
+    if options.get('force_ocr',False) or GLOBAL_ROUTES['global_config'].get('force_ocr_preprocess',False):
         caps['ocr_conversion_force']=True
     logging.info("[force_ocr] state: "+str(caps['ocr_conversion_force']))
     

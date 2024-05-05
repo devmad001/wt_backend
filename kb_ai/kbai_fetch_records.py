@@ -146,7 +146,8 @@ def fetch_KB_records_for_update(case_id='case_3',thread_count=0,record_batch_siz
     for record in records:
         keep_it=True
         if verbose:
-            print ("[fetch TK RECORD candidate]: "+str(record))
+            pass
+            #D# print ("[fetch TK RECORD candidate]: "+str(record)) #Beware print
 
 
 ## DEV

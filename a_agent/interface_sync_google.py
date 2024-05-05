@@ -41,6 +41,8 @@ def interface_sync_case_storage_to_processing_storage(case_id):
 
 def dev1():
     case_id='65725b0050560b89044dca99'
+    case_id='65f99fd37a047045e56b4ccd'
+    
     interface_sync_case_storage_to_processing_storage(case_id)
     return
 

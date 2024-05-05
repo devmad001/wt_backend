@@ -68,10 +68,7 @@ def notes_for_wt_environment():
     ss['key_name']='wt_demo_new.ppk'
     ss['instance_type']=''
     
-
-
     ### WEB  (aka tracker, aka shivam stuff)
-    
     ## WEB PRODUCTION
     ss={}
     ss['todo']=['validate keys']
@@ -89,7 +86,7 @@ def notes_for_wt_environment():
     ss['endpoint']='watch.'
     ss['ip']='3.134.162.56'
     ss['kind']='production|dev'
-    ss['key_name']=''wt_web_production_1.ppk' #?
+    ss['key_name']='wt_web_production_1.ppk' #?
     ss['instance_type']=''
 
     ## WEB DEMO
@@ -103,7 +100,7 @@ def notes_for_wt_environment():
     ss['instance_type']=''
     
 #https://registry.epventures.co/ That is the backend sub domain for dev version.
-8:16
+#8:16
 #please create a new domain for demo backend. ip is http://3.131.56.150#    
 
     return

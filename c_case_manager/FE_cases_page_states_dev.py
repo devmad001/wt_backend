@@ -19,7 +19,7 @@ logging=setup_logging()
 
 from case_service import list_all_cases
 
-from FE_case_states.case_state_class import CASE_Proxy
+from FE_case_states.case_state_class import Case_Proxy
 
 
 ## Include Job status locally for real-time update

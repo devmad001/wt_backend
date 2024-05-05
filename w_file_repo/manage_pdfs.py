@@ -203,7 +203,7 @@ def dev3():
     return
 
 def local_content2highlighted(page_content):
-    from w_pdf.do_highlight.highlight_new import process_data
+    from w_pdf.do_highlight.highlight_new import process_data_org as process_data
     output_file='jonhigh.pdf'
     search_str=['ATM']
     search_str=['2,084.00']
@@ -216,6 +216,10 @@ def dev4():
 
     case_id='case_atm_location'
     filename='07A210E6-B60D-46B6-9D40-9B3239237F05-list.pdf'
+    
+    filename='25680038-ea56-498b-83a8-71aa2b9d1b4b.pdf'
+    case_id='65ca5aed9b6ff316a779e928_local'
+
     full_content,full_key,page_content,page_key=interface_get_pdf_content(case_id,filename,page_num=1)
     
     page_content=local_content2highlighted(page_content)

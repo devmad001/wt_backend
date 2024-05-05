@@ -93,7 +93,8 @@ def alg_get_freq_of_cols(page, line_end='\n', separator=' '):
 
 
 def auto_parse_page(tt):
-    continue=if_needed #but, gpt-4 with A-E mapping and verbose request should fix
+    raise ("[error] not implemented yet")
+    #continue=if_needed #but, gpt-4 with A-E mapping and verbose request should fix
     ## Look for general ways to reduce data scope
     
     print ("[] start in middle of page and walk up until find header")

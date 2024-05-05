@@ -28,6 +28,8 @@ def str2date(the_string):
     ## Cascade of date formats
     #[ ] recall elsewhere you fall back to LLM
     date_obj=''
+    ## Hard code cleaners
+    the_string=re.sub(r'ending', '', the_string, flags=re.I).strip()
     if the_string:
         try: date_obj = datetime.strptime(the_string, "%Y-%m-%d").date()
         except:

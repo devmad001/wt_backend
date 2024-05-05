@@ -167,8 +167,42 @@ def MAIN_ENTRYPOINT_CASE_processing_pipeline(case_id,Agent=None):
         meta_kbai=wt_main_pipeline(case_id=case_id,manual_skip_caps=manual_skip_caps)
 
     run_time=time.time()-start_time
+    import requests
+    import configparser as ConfigParser
     
-    ## BASIC META
+    the_json={}
+    the_json['data']={}
+    data={}
+    data['case_id']=case_id
+    data['update_type']='init_data'
+    the_json['data']=data
+
+    if 'validate serialization' in []:
+        try:
+            the_json=json.dumps(the_json)
+        except Exception as e:
+            raise Exception("[mindstate] could not json dump: "+str(e)+": "+str(the_json))
+            
+    ### ROOT CONFIG
+    RootConfig = ConfigParser.ConfigParser()
+    RootConfig.read(LOCAL_PATH+"../w_settings.ini")
+    
+    FRAUDWS_PORT=RootConfig.get('services','fraudws_port')
+    FRAUDWS_subdomain=RootConfig.get('services','fraudws_subdomain')
+    FRAUDWS_domain=RootConfig.get('services','fraudws_domain')
+    
+    
+    WS_ENDPOINT='https://'+FRAUDWS_subdomain+"."+FRAUDWS_domain
+   
+    
+    full_endpoint=WS_ENDPOINT+"/broadcast_listener"
+    try:
+        response = requests.post(full_endpoint, json=the_json,timeout=5)
+        is_sent=True
+    except Exception as e:
+        logging.info("[mindstate] could not post to: "+str(full_endpoint)+" error: "+str(e))
+        is_sent=False
+    ## BASIC META 
     print ("="*30+" Done MAIN ENTRYPOINT FOR: "+str(case_id))
     print ("[main_pipeline meta]: "+str(meta_main))
     print ("[kbai_pipeline meta]: "+str(meta_kbai))

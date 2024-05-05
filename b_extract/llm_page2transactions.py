@@ -30,10 +30,19 @@ from llm_p2t_support import alg_insert_bullet_point
 from llm_p2t_support import force_manual_page_fixes
 from fix_page_artifacts import auto_clean_page_text  
 
+from m_autoaudit.auto_auditor import AutoAuditor
+from m_autoaudit.auto_auditor import An_Incident
+from m_autoaudit.auto_auditor import register_plugin
+
+from a_agent.global_routes import get_global_routes
+from typing import Dict, Any
+
 from get_logger import setup_logging
 logging=setup_logging()
 
 
+#1v5# JC  Mar 20, 2024  Allow for global configuration of base method
+#1v4# JC  Mar 14, 2024  Add Auto Audit approach if page2T looks difficult  (summary section or complex)
 #1v3# JC  Jan 25, 2024  Extend auto clean page text
 #1v2# JC  Jan 15, 2024  Migrate functions to llm_p2t_support if stand-alone
 #1v1# JC  Jan 13, 2024  Add hard coded filter for transactions (section=Account Summary for example)
@@ -68,9 +77,14 @@ logging=setup_logging()
 
 
 ## Global defs
+GLOBAL_ROUTES=get_global_routes()
+
+
 Config = ConfigParser.ConfigParser()
 Config.read(LOCAL_PATH+"../w_settings.ini")
 SMARTEST_MODEL_NAME=Config.get('performance','smartest_llm_name')
+BASE_MODEL_NAME=GLOBAL_ROUTES['global_config']['llm_page2transactions_base_model_name'] #gpt-3.5-turbo org
+
 
 BANKS_SCHEMA=dev_get_bank_schema()
 
@@ -461,6 +475,15 @@ def hardcode_transaction_removal_assumptions(transaction,keep_it):
     if re.search(r'^total checks',desc):
         reasons+=['Total checks at start of description']
         keep_it=False
+        
+    #Patch
+    if re.search(r'closing balance$',desc,re.I):
+        reasons+=['closing balance at end of description']
+        keep_it=False
+    if re.search(r'opening balance$',desc,re.I):
+        reasons+=['opening balance at end of description']
+        keep_it=False
+        
 
     ## SECTION AND DESCRIPTION BASED
     if keep_it:
@@ -530,8 +553,12 @@ def heuristic_page_stats(page_text):
     return page_stats
 
 
-def formal_prompt_prep(all_prompts={},focus='normal',page_text='',page_lines=[]):
+def formal_prompt_prep(all_prompts={},focus='normal',page_text='',page_lines=[],ptr={}):
     global BANKS_SCHEMA
+    
+    ## PARAMS:
+    #ptr: general page to page pointer.  Ideally not used but gives better date period
+
     meta={}
     
     if focus=='normal':
@@ -570,34 +597,109 @@ def formal_prompt_prep(all_prompts={},focus='normal',page_text='',page_lines=[])
                 for bullet in bullets:
                     prompt=alg_insert_bullet_point(prompt,bullet)
                     
-    #c) Chase started having difficulties with year
+    #c) Include period range of statement
+    if ptr.get('statement_period',''):
+        bullet='- The statement period is: '+ptr['statement_period']
+        prompt=alg_insert_bullet_point(prompt,bullet)
+
+    #d) Chase started having difficulties with year
     #[?] suggest with chase or all so dates are resolved correctly?  Do all for now
-    year=alg_get_page_year(page_text)
+    year=alg_get_page_year(page_text,statement_date=ptr.get('statement_date',''))
     if year:
         # Suggest year format
         bullet='- Note:  The year is likely: '+str(year)+' So, 04/20  -->  '+str(year)+'-04-20'
         prompt=alg_insert_bullet_point(prompt,bullet)
+        
 
     return prompt,meta
 
+### * Auto Audit 'demo' of local plugin to apply  (see: apply_auto_audit.py)
+@register_plugin(['odd_content_not_3.5'])
+def challenging_content(scope, schema, state):
+    #** hard to enforce schema stuff while remaining flexible so have loosely bound but modular
 
+    suggestive_actions=[]
+    suggest_good_results=[]
+
+    incidents=[]
+    report={}
+    
+    ## Check state assuming
+    if 'content' in state:
+        
+        # A)  recall if >250 numbers then yes challenging  (move this from codebase to here)
+        if len(re.findall(r'[\d\.\,]+', state['content']))>250:
+            Incident=An_Incident('content has over 250 numbers',scope='odd_content_not_3.5')
+            Incident.suggest_action("use_gpt_4")
+            incidents.append(Incident)
+            
+        # B)  if summary in text then do blanket gpt-4 suggestive action
+        if re.search(r'summary',state['content'],re.IGNORECASE):
+            ## Assume state 'models' would have '4' in it
+            if '4' in str(state.get('models',[])):
+                print ("[debug] ignore if it thinks gpt-4 already used")
+            else:
+                Incident=An_Incident('content has SUMMARY => no 3.5',scope='odd_content_not_3.5')
+                Incident.suggest_action("use_gpt_4")
+                incidents.append(Incident)
+    
+    return incidents,report
+
+@register_plugin(['hallucination_gpt3_5'])
+def audit_hallucinations(scope, schema, state):
+    incidents=[]
+    report={}
+    probh=0
+    assumed_model_used='gpt-3.5'  #Not used but for reference since suggested_actions is to gpt-4
+
+    ### General prompt terms repeated back
+    #    ^yes, this is rather specific to application
+    bad_terms=['123 Main St','Anytown,']
+    
+    def search_in_dict_dump(data: Dict[str, Any], search: str) -> bool:
+        match=False
+        json_content = json.dumps(data)
+        pattern = re.compile(search)
+        match=pattern.search(json_content)
+
+    for term in bad_terms:
+        if search_in_dict_dump(state, term):
+            probh=70
+            incidents.append(An_Incident('Hallucinated address: '+term))
+            print ("[audit_hallucinations] Hallucinated address: "+term)
+            break
+
+    return incidents,report
+    
 ## Called from:  call_transaction_processing_pipeline @ call_llm_process.py
-def llm_page2transactions(epage=None,bank_name='',doc_dict={},page_text='',try_cache=True, verbose=True):
-    global BANKS_SCHEMA, SMARTEST_MODEL_NAME
+def llm_page2transactions(epage=None,bank_name='',doc_dict={},page_text='',try_cache=True, verbose=True, ptr={}):
+    global BANKS_SCHEMA, SMARTEST_MODEL_NAME, BASE_MODEL_NAME
+    
+    ## PARAMS
+    # To grab global state (statement-wise, use ptr directly)
+    # ptr: standard pointer of info
+    # doc_dict:  not used?
+    
+    ## BASE_MODEL_NAME suggestions:
+    #- recall, will fall back to smarter model if complex page!
+
+
     THREAD_QUIET=False
 
     ## doc_dict:  full path of input file (filename_path, page_number)
     meta={}
     transactions={'all_transactions':[]}
     
-
     ## [ ] optionally upgrade to KBAI
     if page_text or doc_dict:
         logging.warning("[warn] allow page_text during debug only")
     
-    LLM=LazyLoadLLM.get_instance()
-    
-    ## Try new method
+    ## Initialize base LLM model
+    #- original gpt-3.5-turbo
+    validated_types=['gpt-3.5-turbo','gpt-4','gpt-4-turbo']
+    if not BASE_MODEL_NAME in validated_types:
+        raise Exception("[error] invalid BASE_MODEL_NAME: "+str(BASE_MODEL_NAME))
+    LLM=LazyLoadLLM.get_instance(model_name=BASE_MODEL_NAME)
     
     ### TRACK odd pdf conversions:
     #- pdfminer:  schoolkidz page 10 puts some amounts to very end of text list. Basically unuseable.
@@ -615,8 +717,15 @@ def llm_page2transactions(epage=None,bank_name='',doc_dict={},page_text='',try_c
     ###############################################
     ### CLEAN PAGE TEXT
     page_text=auto_clean_page_text(page_text)
-    year=alg_get_page_year(page_text)
-    page_text=force_manual_page_fixes(page_text,year=year)
+    
+    ## Include global statement period or year
+    
+    ## Pseudo suggest date range since entries may not have year
+    #statement_date='2016-04-15'  #Default start of period
+    #statement_period: '2016-04-15 to 2016-05-12''
+    year=alg_get_page_year(page_text,statement_date=ptr.get('statement_date',''))
+
+    page_text=force_manual_page_fixes(page_text,year=year,statement_date=ptr.get('statement_date',''),statement_period=ptr.get('statement_period',''))
     ###############################################
     
 
@@ -640,7 +749,7 @@ def llm_page2transactions(epage=None,bank_name='',doc_dict={},page_text='',try_c
     
         all_prompts=get_p2t_prompt(page_text)
 
-        prompt,formal_meta=formal_prompt_prep(all_prompts=all_prompts,focus='normal',page_text=page_text,page_lines=page_lines)
+        prompt,formal_meta=formal_prompt_prep(all_prompts=all_prompts,focus='normal',page_text=page_text,page_lines=page_lines,ptr=ptr)
     
         if verbose:
             print ("[page2transactions prompt]: "+str(prompt))
@@ -655,21 +764,41 @@ def llm_page2transactions(epage=None,bank_name='',doc_dict={},page_text='',try_c
         else:
 
             try:
-                # This not cache or can cause logging error?
-                #- or can remove
-                logging.info("[d3]  full_prompt: "+page_text.encode('utf-8', errors='replace').decode('utf-8')) #Decode to logging err
-            except:
-                pass
+                ## May still throw error because logging throwing to file?
+                temp=page_text.encode('utf-8', errors='replace').decode('utf-8')
+                logging.info("[d3]  full_prompt: "+temp)
+            except Exception as e:
+                print(f"Logging failed with exception: {e}")
     
-        ### WHILE PROMPT UNTIL VALID
+
+        #######################################
+        # CONDITIONAL BRANCHE OPTIONS
+        #  *part of auto audit design
+        #  (dynamic configuration based on page stats and other factors)
+        #######################################
+        #[A]  -> direct to gpt-4 if complex page
         if page_stats['is_complex_page'] or formal_meta.get('is_complex_page',False):
             model='gpt-4'
             logging.info("[choose gpt-4 because complex page]")
-
         else:
             model='default'
             
+        #[B]  -> If summary section use gpt-4 since issues with 3.5 thinking its' a transaction
+        #> direct logic fine but for demo I want auto audit
+        if model=='default':
+            scopes=['odd_content_not_3.5']
+            state={'content':page_text}
+            Auditor=AutoAuditor()
+            incidents,report=Auditor.run_audit_pipeline(scopes=scopes,schema={},state=state)
+            for incident in incidents:
+                if incident.scope=='odd_content_not_3.5':
+                    model='gpt-4'
+                    logging.info("[choose gpt-4 because odd_content_not_3.5]")
+            if incidents:
+                Auditor.log_audit_results(scopes=scopes,state=state,results='pre-config set gpt-4 as model')
 
+        #######################################
+            
         try_cache=True
         got_all_transactions=False
         count_tries=0
@@ -697,7 +826,7 @@ def llm_page2transactions(epage=None,bank_name='',doc_dict={},page_text='',try_c
                 if not model=='gpt-4': raise Exception("[error] invalid model: "+str(model))
     
                 ## Larger model if issues or ie/ >30 transactions
-                prompt,formal_meta=formal_prompt_prep(all_prompts=all_prompts,focus='gpt-4',page_text=page_text,page_lines=page_lines)
+                prompt,formal_meta=formal_prompt_prep(all_prompts=all_prompts,focus='gpt-4',page_text=page_text,page_lines=page_lines,ptr=ptr)
 
                 full_prompt=prompt+page_text
                 LLMSMARTEST=LazyLoadLLM.get_instance(model_name=SMARTEST_MODEL_NAME) #OPTIONALLY BOOST TO GPT4 IF PROBLEMS
@@ -728,7 +857,7 @@ def llm_page2transactions(epage=None,bank_name='',doc_dict={},page_text='',try_c
                     ## Case ends ... (not closed)
                     #i)  Specifically ask for no ... and proper json reiterate
                     if re.search(r'\.\.\.',str(transactions)) or re.search(r'\d$',str(transactions)):
-                        prompt,meta=formal_prompt_prep(all_prompts=all_prompts,focus='dotdotdot',page_text=page_text,page_lines=page_lines)
+                        prompt,meta=formal_prompt_prep(all_prompts=all_prompts,focus='dotdotdot',page_text=page_text,page_lines=page_lines,ptr=ptr)
 
                         full_prompt=prompt+page_text
                     else:
@@ -777,6 +906,8 @@ def llm_page2transactions(epage=None,bank_name='',doc_dict={},page_text='',try_c
             if isinstance(transactions,dict):
                 logging.info("[intermediary found count]: "+str(len(transactions.get('all_transactions',[]))))
             
+            #################################
+            ## EXTENDED LOGIC FOR CONTINUING
             ##[A] If complex and not got all or tried gpt-4 then do that
             if page_stats['is_complex_page'] and count_tries>2 and not got_all_transactions and model=='default':
                 model='gpt-4' #<--- swaps prompt above
@@ -795,6 +926,20 @@ def llm_page2transactions(epage=None,bank_name='',doc_dict={},page_text='',try_c
             if count_tries==2 and not got_all_transactions and model=='default':
                 model='gpt-4'
                 logging.info("[BOOST TO GPT-4] onto try #3 and not all transactions")
+
+            #### AUDIT conditional branch
+            #[D]  -> Check for hallucination ie/ 123 Main St
+            if model=='default':
+                scopes=['hallucination_gpt3_5']
+                state=transactions
+                Auditor=AutoAuditor()
+                incidents,report=Auditor.run_audit_pipeline(scopes=scopes,schema={},state=state)
+                if incidents:
+                    got_all_transactions=False
+                    model='gpt-4'
+                    logging.info("[choose gpt-4 because possible hallucination with default model")
+                    Auditor.log_audit_results(scopes=scopes,state=state,results='use gpt-4 possible hallucination')
+    
     
     
 #        logging.info ("[page2t] EXTRACTED: "+str(json.dumps(transactions,indent=4)))
@@ -814,8 +959,13 @@ def llm_page2transactions(epage=None,bank_name='',doc_dict={},page_text='',try_c
     ## Merge sub_transactions
     global_transactions={'all_transactions':[]}
     for transactions in sub_transactions:
-        for entry in transactions.get('all_transactions',[]):
-            global_transactions['all_transactions']+=[entry]
+        #List?
+        if isinstance(transactions,list):
+            for entry in transactions:
+                global_transactions['all_transactions']+=[entry]
+        else: #Assume dict
+            for entry in transactions.get('all_transactions',[]):
+                global_transactions['all_transactions']+=[entry]
 
     if verbose:
         print ("[llm_page2t] TRANSACTIONS FOUND ON PAGE FINAL:")

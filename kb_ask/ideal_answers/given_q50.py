@@ -54,7 +54,7 @@ def get_qq(id):
     
     ## Extra:
     #(ie likely not hard coded)
-    qq[['difficulty']=0.50
+    qq['difficulty']=0.50
     return qq
 
 ## Q1:  What is the account holder?
@@ -720,7 +720,7 @@ qq['cypher_query'] = "MATCH (t:Transaction) WHERE t.description CONTAINS 'Airpor
 qq['cypher_query_variations'] = ["MATCH (t:Transaction) WHERE t.description CONTAINS 'Airport' RETURN t"]
 qq['cypher_query_samples'] = ["MATCH (t:Transaction) WHERE t.description CONTAINS 'Airport' RETURN t"]
 qq['answer_score'] = 0.85
-qq['answer'] = 'Transactions related to 'Airport': Transaction1, Transaction2, ...'
+qq['answer'] = "Transactions related to 'Airport': Transaction1, Transaction2, ..."
 qq['multimodal'] = {}
 guides[qq['question_id_tag']] = qq
 
@@ -734,7 +734,7 @@ qq['cypher_query'] = "MATCH (t:Transaction) WHERE t.description CONTAINS 'Ammo' 
 qq['cypher_query_variations'] = ["MATCH (t:Transaction) WHERE t.description CONTAINS 'Ammo' RETURN t"]
 qq['cypher_query_samples'] = ["MATCH (t:Transaction) WHERE t.description CONTAINS 'Ammo' RETURN t"]
 qq['answer_score'] = 0.85
-qq['answer'] = 'Transactions mentioning 'Ammo': Transaction3, Transaction4, ...'
+qq['answer'] = "Transactions mentioning 'Ammo': Transaction3, Transaction4, ..."
 qq['multimodal'] = {}
 guides[qq['question_id_tag']] = qq
 
@@ -748,7 +748,7 @@ qq['cypher_query'] = "MATCH (t:Transaction) WHERE t.description CONTAINS 'Chemic
 qq['cypher_query_variations'] = ["MATCH (t:Transaction) WHERE t.description CONTAINS 'Chemical' RETURN t"]
 qq['cypher_query_samples'] = ["MATCH (t:Transaction) WHERE t.description CONTAINS 'Chemical' RETURN t"]
 qq['answer_score'] = 0.85
-qq['answer'] = 'Transactions with 'Chemical': Transaction5, Transaction6, ...'
+qq['answer'] = "Transactions with 'Chemical': Transaction5, Transaction6, ..."
 qq['multimodal'] = {}
 guides[qq['question_id_tag']] = qq
 
@@ -762,7 +762,7 @@ qq['cypher_query'] = "MATCH (t:Transaction) WHERE t.description CONTAINS 'SPECIF
 qq['cypher_query_variations'] = ["MATCH (t:Transaction) WHERE t.description CONTAINS 'SPECIFIC_KEYWORD' RETURN t"]
 qq['cypher_query_samples'] = ["MATCH (t:Transaction) WHERE t.description CONTAINS 'SPECIFIC_KEYWORD' RETURN t"]
 qq['answer_score'] = 0.85
-qq['answer'] = 'Transactions containing 'SPECIFIC_KEYWORD': Transaction7, Transaction8, ...'
+qq['answer'] = "Transactions containing 'SPECIFIC_KEYWORD': Transaction7, Transaction8, ..."
 qq['multimodal'] = {}
 guides[qq['question_id_tag']] = qq
 

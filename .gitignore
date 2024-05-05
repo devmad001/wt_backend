@@ -1,0 +1,67 @@
+*~
+*.sw[pmnol]
+*.pyc
+**__pycache__
+.sync/
+
+
+## Data files
+*.tsv
+*.zip
+*.sqlite
+*.log
+*.out
+*.db
+*.gz
+*.mp4
+
+## Config files
+*.ini
+.project
+.pydevproject
+.settings
+
+## Images
+*.tif
+*.tiff
+
+## GEO
+*.shp
+
+## ML models
+*.h5
+*.hdf5
+*.tfrec
+
+## Meta files
+*.json
+
+## Install fiels
+*.whl
+*.msi
+
+## misc
+*.dat
+*.har
+*.sql
+
+## App specific
+# remove if previously tracked:  git rm -r --cached w_ui/excel_manager/excel_files/
+w_viz/extractors/
+w_storage/gret_gstorage/
+w_ui/file_manager/chunk/
+w_datasets/run_logs/
+
+## no storage job pdfs
+w_ui/file_manager/storage/**/*/*.pdf
+
+## No run logs
+w_datasets/run_logs/run_logs.jsonl
+w_datasets/run_logs/logs/
+w_datasets/logs/
+w_datasets/jobs_log/
+w_datasets/run_logs/
+z_server/nohup_logs/
+w_ui/excel_manager/excel_files/
+w_datasets/logs/
+**/dev.log**

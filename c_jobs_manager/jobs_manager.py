@@ -140,6 +140,11 @@ class JobsManager:
             return db.query(JobModel).filter(JobModel.case_id==case_id).count()>0
         return
 
+    def peek_next_job_to_run(self, case_id):
+        """Peek at the first created job whose status is not RUNNING."""
+        with SessionLocal() as db:
+            return db.query(JobModel).filter(JobModel.status != "RUNNING", JobModel.case_id == case_id).order_by(JobModel.created_at).first()
+
 
 # Example usage
 def dev1():

@@ -42,6 +42,8 @@ def dev_get_bank_schema():
     CHASE={}
     BOA={}
     WELLSFARGO={}
+    GENERIC={}
+    GENERIC['bullets']=[]
     
     CHASE['bullets']=[]
 
@@ -157,6 +159,9 @@ def dev_get_bank_schema():
     ## Transaction history may have odd column alignment so be firm on how many
     #BAD DISTRACTS AND THINKS transaction history is a section    WELLSFARGO['bullets']+=[(r'Transaction history',["- the Transaction history table has 6 columns: Date, Check Number, Description, Deposits/Additions, Withdrawals/Subtractions, Ending daily balance."])]
 
+    # March 16, 2024
+    # Thinks reversal is negative amount but not: https://core.epventures.co/api/v1/case/65caaffb9b6ff316a779f525/pdf/M&T%20Victim%20Records__Reserve%202023__STMT__1.pdf?page=1&key=02034da377b58ab78ac6fdb2a7c0523890051eb46a33161dc13781750e4e5c8c&highlight=2000.00|Transfer%2FDeposit|Branch|In
+    GENERIC['bullets']+=[(r'REVERSE MONTHLY SERVICE CHARGE',["- The 'REVERSE MONTHLY SERVICE CHARGE' is a positive amount (If listed as DEPOSIT)"])]
 
     
     ###############################################
@@ -185,6 +190,10 @@ def dev_get_bank_schema():
     #[C]  M&T (Hogan)
     #- how to balance your account:
     skip_entire_page_regex+=['Any deposils and other oredits shown on this statement which you have not already entered']
+
+    #[D]  TD
+    #- how to balance your account:
+    skip_entire_page_regex+=['Begin by adjusting your account register'] #How to Balance your Account
     
     banks_schema['skip_entire_page_regex']=skip_entire_page_regex
 
@@ -192,12 +201,14 @@ def dev_get_bank_schema():
     ##    SKIP ENTIRE PAGES FROM TRANSACTION PROCESSING
     ######################################################
     #> specificaly don't do llm_page2transactions if match here ie/ known title pages etc.
+    #- may do in page extractor too?
     
     ## Ok to blend banks for now because high savings on skip
     
     ## Wells Fargo.  Keep high level demo really for now
     se=[]
     se+=[['You and Wells Fargo','Account options']]  #Multiple required for match
+    se+=[['This Page Intentionally Left Blank']]
     banks_schema['skip_entire_transaction_page_regex']=se
 
     
@@ -237,6 +248,7 @@ def dev_get_bank_schema():
     banks_schema['banks']['bank_of_america']=BOA
     banks_schema['banks']['chase']=CHASE
     banks_schema['banks']['wells_fargo']=WELLSFARGO
+    banks_schema['banks']['generic']=GENERIC  #<-- pickedup used always
     
     
     banks_schema['bank_kind_regexes']=kindregexes

@@ -1,0 +1,56 @@
+Account number. 1378151599 W February 1, 2022 -February 28 2022 m Page 6 of 12 REDE Page 162 of 261
+ailla e
+Electronic debits/bank debits (continued)
+Effective Posted
+date date Amount  Transaction detail
+02/08  43,000.00 Online Transfer to Autonomous Inc. Commercial Business Checking xxxxxx8464
+Ref #b0DjyzhéL on 02/08/22
+02/08 41216777 Business to Business ACH Debit -Brex Inc. Payments 220206 Brexi7WrofdwOF
+NTE*ZZZ*BrexCard Paymenf\
+02/08  101,961.53 Business to Business ACH Debit -Brex Inc. Payments 220205 Brexi7Waknhlim
+NTE*ZZZ*Brex Card Payment\
+02/08 26,363,086 Business to Business ACH Debit - TX Comptroller Tax Pymt 05059764/20207
+33311/12345/EDI/ Xmi -
+02/08  15,498.99 Business to Business ACH Debit - Brex Inc, Payments 220208 Brexi7Wuth9Akb
+NTE*ZZZ*Brex Card Payment\
+02/09  6,734.49 NC Dept Revenue Tax Pymt 220208 043000093053150 Inc. Autonomous
+02/09  11,356.71 Business to Business ACH Debit - AZ Dept of Rev Ccddir. Dbt xxxxx5730
+Autonomous Inc
+02/09 891817 < Business toBusiness ACH Debit - NJ S&U Web Pmt Njweb55 091000018745984
+Txp*Bxexx1611000*04120*220130*T*891817*****Aut o\
+02/09  5,927.00 Business to Business ACH Debit - TN State Revenue TN Tap 220208 xxxxx8896
+Autonomous Inc
+02/09 2,059,09 Business to Business ACH Debit - Wl Dept Revenue Taxpaymnt 220208
+2095576256 Autonomous Inc
+02/09 727.25 Business to Business ACH Debit - Brex Inc. Payments 220209 Brexi7Wwpd7HIn
+NTE*ZZZ*Brex Card Payment\
+02/10 120,00 Bill Pay Justin Sotingco on-Line No Account Number on 02-10
+02/10 4000 Bill PayRahul Sachan on-Line No Account Number on 02-10
+02/10 20.00 Bill Pay Felipe Diaz on-Line No Account Number on 02-10
+02/10 20.00 Bill Pay Yang Fang on-Line No Account Number on 02-10
+02/10 20,00 Bill Pay Xueer Zhu on-Line No Account Number on 02-10
+02/10  116,438.04  WT 220210-007261 Bank of America, NE /Bnf=Apex Maritime CO,, Inc. Srf#
+Gw00000048473852 Trn#220210007261 Rfb# 4965
+02/10  35,206.85 WT Fed#00385 Silicon Valley Ban /Ftr/Bnf=Ordermark, Inc. Sri#
+Gw0000004847 3853 Trn#220210007191 Rib# 4973
+02/10 850000  WTFed#00517 Sterling National /Fir/Bnf=Muck Rack LLC Srf#
+Gw0000004847 3694 Trn#220210007234 Rib# 4961
+02/10  1,055.00 WT 220210-007215 Bank of America, NE /Bnf=Lyna Huynh Sri#
+Gw0000004847 3849 Trn#220210007215R1b# 4962
+02/10  196,560.00  WT 220210-007232Bank of Ningbo CO., /Bnf=Ningbo Acke Office Equipment
+CO.Lt Srf# Gw00000048473696 Trn#220210007 232 Ribi# 4977
+02/10 8502141 WT 220210-007231 Bank of China /Bnf=Ningbo Yushun International Logist Srf#
+Gw0000004847 3526 Trn#220210007231 Rib# 4972
+02/10  69,392.00 WT 220210-007243 Bank of Ningbo CO,, /Bnf=Zhejiang Yueqgiang F urniture
+Techno Sri# Gw0000004 8473854 Trn#220210007 243 Rib# 4978
+02/10 46,200,00 WT 220210-007247 Bank for Foreign Tr/Bnf=Phat LOC Transport Logistics
+Compa Sri# Gw0000004847 3695 Trrnd220210007247 Rib# 4970
+02/10 21,40813 WT 220210-007743 Rabobank Nederland /Bnf=Timmermans Transport Bv Srf#
+Gw0000004847 3527 Trn#220210007743 Rib# 4966
+02/10  14,000.00 WT 220210-007233 Hongkong and Shangh /Bnf=0Qocl Logistics (Vietnam)
+Company L Srf# Gw00000048473525 Trn#220210007233 Rib# 4969
+02/10 11,69895  WT 220210-007857 Royal Bank of Canad /Bnf=Caytor Consulting Sri#
+Gw0000004847 3699 Trn#220210007857 Rib# 4974
+02/10 5816.93 WT 220210-007820 Bank of Montreal, T /Bnf=McKenna $ Warehouse and
+BROI0 Wells Fargo Bank NA
+All rights reserved Member FDIC Distributi Sri# Gw0000004847 3528 Trn#220210007820 Rfb# 4967

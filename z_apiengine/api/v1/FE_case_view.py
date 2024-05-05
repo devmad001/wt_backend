@@ -229,7 +229,7 @@ async def start_case_processing(case_id: str,fin_session_id: str = ''):  # Use s
         user_input_word='request_start_processing' #FSM is burried
         
         if False: #Update as required
-            processing_status,case_state=iDELnterface_FE_user_cases_page_state(case_id,user_input=user_input_word)
+            processing_status,case_state=interface_FE_user_cases_page_state(case_id,user_input=user_input_word)
             ## Pass user facing state of Case
             if processing_status['case_state']=='Processing':
                 message='Case is processing!'

@@ -95,9 +95,13 @@ ALLOW_ORIGINS_LIST=[
         "http://127.0.0.1:8008",
         "http://3.134.162.56",
         "http://3.20.195.157",
+        'http://3.131.56.150',
+        'http://18.118.67.255',
+        'https://3.131.56.150',
         "https://3.134.162.56",
         "https://3.20.195.157",
         'https://18.118.67.255',
+        "https://watchdemo.epventures.co",
         "https://watchdev.epventures.co",
         "https://watch.epventures.co"
 ]
@@ -258,10 +262,7 @@ async def handle_dashboard_update(request: Request):
     #- force_datahash_change:  for dev purposes (test_broadcase_ws.py) when want to see elements refresh
     
     data = await request.json()
-
-#D1#    logging.info("[broadcast_listener] (send to FE) data: " + str(data))
-    data_length=len(str(data))
-    logging.info("[broadcast_listener] (send to FE) data length (beware may be long): " + str(data_length))
+    logging.info("[broadcast_listener] (send to FE) data: " + str(data))
 
     case_id = data['data']['case_id']
     session_id = data['data'].get('session_id', '')
@@ -308,10 +309,6 @@ async def handle_dashboard_update(request: Request):
             if not did_insert and component.get('is_main',False):
                 component['src']=data['data']['url']
                 did_insert=True
-
-            ## Force type on waterfall & butterfly (when button clicked) patch Feb 21, 2024
-            if component['src'] and '/waterfall' in component['src']: component['type']='waterfall'
-            if component['src'] and '/butterfly' in component['src']: component['type']='butterfly'
 
             components.append(component)
         message['data']['components']=components
@@ -378,18 +375,10 @@ async def handle_dashboard_update(request: Request):
     return {"status": is_connected}
 
 
-"""
-NOTES
-print ("python -m uvicorn fast_main:app --port 8008 --workers 1")  #1 so can --reloadj
-#NO --reload AND --workers# print ("python -m uvicorn fast_main:app --reload --port 8008")
-"""
 
 if __name__ == "__main__":
     import uvicorn
 #    uvicorn.run(app, host="0.0.0.0", port=8008,reload=True)
-#    print ("SERVER: "+str(FRAUDWS_PORT))
-    cmd='python -m uvicorn fast_ws_1:app --port 8009 --workers 5'
-    print ("UBUNTU CMD: "+str(cmd))
     uvicorn.run(app, host="0.0.0.0", port=FRAUDWS_PORT)
 
     

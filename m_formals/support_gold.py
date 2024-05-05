@@ -24,6 +24,9 @@ from w_pdf.ocr_model import interface_pdfocr
 from a_custom.smart_extract import local_extract_first_page_style_data
 
 from kb_ai.call_kbai import interface_call_kb_auto_update
+from kb_ai.cypher_markups.markup_alg_cypher_EASY_CREDIT_DEBIT import is_transaction_credit
+
+from w_pdf.ocr_model import interface_pdfocr
 
 from get_logger import setup_logging
 logging=setup_logging()
@@ -65,6 +68,9 @@ if not os.path.exists(TEMP_DIR):
 
 """
 
+def local_ocr(input_pdf,output_pdf,downsample=300,jobs=2,upsample=150):
+    return interface_pdfocr(input_pdf,output_pdf,downsample=downsample,jobs=jobs,upsample=upsample)
+
 def local_process_case_remove_first(case_id):
     #[ ] see dev_challenges
     return 
@@ -97,6 +103,12 @@ def local_transaction_type_on_subgraph(case_id):
     response=interface_call_kb_auto_update(case_id,force_update_all=True,force_algs_to_apply=force_algs_to_apply,commit=commit,force_thread_count=1)
 
     return response
+
+def local_is_transaction_credit(tt):
+    #**this is part of markup section but too many assumptions?
+    tcredit={} #DICT
+    is_credit,tcredit,reasons=is_transaction_credit(tt)
+    return is_credit,tcredit,reasons
 
 ###################################################################################
 #^above are core system functions (to test)

@@ -35,7 +35,7 @@ HARD_CODE_TEST_DIRS += ['w_test/test_fastapi/api/v1']
 
 HARD_CODE_TEST_DIRS += ['c_case_manager']  # test_case_queue
 HARD_CODE_TEST_DIRS += ['c_jobs_manager']  # job focused
-HARD_CODE_TEST_DIRS += ['w_llm']
+HARD_CODE_TEST_DIRS += ['w_llm']           # Should do test_llm
 
 HARD_CODE_TEST_DIRS += ['a_algs/geo_algs'] # google place lookup
 HARD_CODE_TEST_DIRS += ['c_macros/fixed_queries'] # transaction tracker etc.

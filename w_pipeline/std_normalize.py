@@ -56,9 +56,11 @@ def do_normalize(mega,run={},job={}):
 
         if is_image_pdf:
             logging.warning("[do_normalize] THINKS is_image_pdf: "+str(path_filename))
-            raise Exception("[do_normalize] BAD OCR?? THINKS is_image_pdf: "+str(path_filename))
+            #JC branch old# raise Exception("[do_normalize] BAD OCR?? THINKS is_image_pdf: "+str(path_filename))
 
-        ## Call and map
+        #################################
+        ## PDF FILE TO DOCUMENT OBJECT
+        #################################
         Doc=interface_file2doc(path_filename)
         file_pages[fname]['epages']=Doc.get_epages()
         

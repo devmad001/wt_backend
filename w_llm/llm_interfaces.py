@@ -60,6 +60,13 @@ logging=setup_logging()
 """
 
 """
+TODO:
+> 204 timeout default but alternative is kill if >20s for auto retry
+
+"""
+
+
+"""
 USE LANGCHAIN FOR NOW
 llm_portal.py
 
@@ -205,7 +212,7 @@ class OpenAILLM(BaseLLM):
         ## Allow mapping from easy application name to model name
         if given_name=='gpt-4-slow':
             model_name='gpt-4'
-        elif given_name=='gpt-4-fast':
+        elif given_name=='gpt-4-fast' or given_name=='gpt-4-turbo':
             model_name='gpt-4-1106-preview'
         elif given_name=='gpt-3-fast':
             model_name='gpt-3.5-turbo'
@@ -259,6 +266,8 @@ class OpenAILLM(BaseLLM):
         meta['model_name']=self.model_name
         meta['library']=self.library
         meta['tokens']=-1
+        words=re.findall(r'\w+',prompt)
+        meta['word_count']=len(words)
 
         results={}
 
@@ -300,6 +309,8 @@ class OpenAILLM(BaseLLM):
             retries=2
             results={}
             count_loops=0
+            
+            print ("[debug] word count: "+str(meta['word_count']))
             while not results and retries:
                 count_loops+=1
                 retries-=1
@@ -308,8 +319,6 @@ class OpenAILLM(BaseLLM):
                 
 
                 ## NEW MULTIPLE WAYS TO QUERY!
-
-                print ("[debug] recall, 5 retries if timeout...won't throw errror until all 5 tried (Internal to  langchain)")
 
                 try:
 
@@ -590,7 +599,12 @@ def report_admin_stats():
     return
 
 def test_ask_chat_question():
-    LLM=OpenAILLM()
+
+    ## Test alternative model
+    
+#    LLM=OpenAILLM()
+    LLM=OpenAILLM(model_name='gpt-4-turbo')
+
     prompt="Hello, my name is John. What is your name?"
 
     print ("[query]: "+str(prompt))

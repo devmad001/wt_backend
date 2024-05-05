@@ -10,7 +10,7 @@ LOCAL_PATH = os.path.abspath(os.path.dirname(__file__))+"/"
 sys.path.insert(0,LOCAL_PATH)
 sys.path.insert(0,LOCAL_PATH+"../")
 
-from sqlalchemy import create_engine, Column, Integer, String, JSON
+from sqlalchemy import create_engine, Column, Integer, String, JSON, DateTime, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -56,14 +56,15 @@ from z_apiengine.database import engine
 
 class JobModel(Base):
     __tablename__ = 'jobs'
-    
-    
+    __table_args__ = {'extend_existing': True}
+
     id = Column(Integer, primary_key=True)
     name = Column(String(255))
-    case_id= Column(String(255))
+    case_id = Column(String(255))
     status = Column(String(50))
     data = Column(JSON)  # Adding a JSON field
-    # Add other relevant fields as needed
+    created_at = Column(DateTime, default=func.now())  # Automatically set on creation
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())  # Automatically updated
 
     def to_dict(self):
         return {key: value for key, value in self.__dict__.items() if not key.startswith('_')}

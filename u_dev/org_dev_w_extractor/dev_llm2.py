@@ -157,7 +157,7 @@ def dev_pages2transactions(verbose=True,run={}):
     dd=json.loads(response)
 
     ## Inner validation
-        run['cautions']=run.get('cautions',[])+['[transaction2cypher] count of inserts: '+str(count_inserts)+" not equal to transactions: "+str(len(transactions['all_transactions']))]
+    run['cautions']=run.get('cautions',[])+['[transaction2cypher] count of inserts: '+str(count_inserts)+" not equal to transactions: "+str(len(transactions['all_transactions']))]
     
     return dd
 

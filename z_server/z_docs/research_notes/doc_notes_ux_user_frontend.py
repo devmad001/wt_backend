@@ -46,7 +46,7 @@ def dev1():
         print ("User clicks button == pre_defined_question request")
         print ("- flow is the same as above except:")
         print ("1.b) button submits post to wt_flask_handler.py")
-        print ("4.c) kb_ask.py SPECIAL_ROUTING on 'button_name')
+        print ("4.c) kb_ask.py SPECIAL_ROUTING on 'button_name")
         print ("5.b) question to kb_router.py answers question")
         
     if 'jon_simulates_button_click' in b:

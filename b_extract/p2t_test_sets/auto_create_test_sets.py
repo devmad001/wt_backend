@@ -104,6 +104,8 @@ def run_pdf2pdfpage2transactions_test(pdf_filename,target_page_num):
 
 def run_pdf_filename2transactions_test(pdf_filename,page_number=1):
     ## Assume only one page number
+    all_transactions=[]
+    meta={}
 
     total_transactions=0
     for page_num,extraction_method,content,epage in pdf2epages(pdf_filename):

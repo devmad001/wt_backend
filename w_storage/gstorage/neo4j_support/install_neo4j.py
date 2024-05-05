@@ -74,7 +74,7 @@ def dev_install_notes():
 
     ### Firewall
     cmds+=['sudo ufw enable']
-    cmds+=['sudo ufw status"]
+    cmds+=['sudo ufw status']
 
     """
     sudo ufw allow 22
@@ -92,7 +92,7 @@ def dev_install_notes():
 
     """
 
-    CHECK for external access!!
+    #CHECK for external access!!
     #- may take a bit from another server if server was down!
 
     #? cypher-shell -a 'neo4j://3.20.195.157:7687'

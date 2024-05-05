@@ -32,6 +32,8 @@ def adjust_transactions_top_level(transactions={},transaction={}):
     ## transaction_amount remove $ and commas immediately!
     #- process as str, expect float output
     #- full list of records or single record
+    
+    print ("[ ] beware assume transactions could be signed but sign may be incorrect or dropped!")
 
     given_type='normal'
 
@@ -63,8 +65,10 @@ def adjust_transactions_top_level(transactions={},transaction={}):
             continue # Will fail at dict get otherwise
         if re.search('-',str(entry.get('transaction_amount',''))):
             transactions_are_signed=True
+#D1#            print ("[debug] transactions signed at: "+str(entry))
             break
 
+    print ("[debug] are transactions signed: "+str(transactions_are_signed))
     for entry in transactions.get('all_transactions',[]):
         if isinstance(entry,str):
             logging.error('[entry is str]: '+str(entry))
@@ -94,11 +98,15 @@ def adjust_transactions_top_level(transactions={},transaction={}):
         #### -> AMOUNT SIGN new field
         #** good context but ultimately handled depending on how summed at db level
         #- recall, page-level sorting is by amount, so sign is important
+        #- beware, starts assumption on credit/debit classifier
+        print ("[ ] amount sign not just based on statement..see credit classifier")
         if transactions_are_signed:
             if '-' in str(entry['transaction_amount']):
                 entry['amount_sign']='-'
             else:
+                ## Beware assuming positive because may not all be signed
                 entry['amount_sign']='+'
+        
         
         try: entry['transaction_amount']=abs(entry['transaction_amount'])
         except: pass

@@ -17,6 +17,9 @@ logging=setup_logging()
 
 logging.debug("[loading pdf_extractor.py] -- 0.3s...")
 
+from m_autoaudit.audit_plugins.audit_plugins_main import alg_count_joined_words
+from m_autoaudit.audit_plugins.audit_plugins_main import alg_ocr_quality
+
 from pdfminer.high_level import extract_text #pip install pdfminer.six
 from pdfminer.high_level import extract_pages as pdfminer_extract_pages
 from pdfminer.pdfparser import PDFParser
@@ -33,6 +36,7 @@ from PyPDF2 import PdfReader   #BOA tables
 
 
 
+#0v4# JC  Mar  1, 2024  Issue on pdf2txt with PyPDF2 (tables) where drops font and drops space for TD
 #0v3# JC  Sep 18, 2023  pdf to base64 pages
 #0v2# JC  Sep 11, 2023  pypdf2 works better for BOA tables
 #0v1# JC  Sep  2, 2023  Init
@@ -47,6 +51,7 @@ https://pdfminersix.readthedocs.io/en/latest/
 #- pdfminer does columns separately (ie/ totals at bottom of page!)
 #- pypdf2 does tables well!
 #- camelot heavy install
+
 
 class PDF_Extractor():
     """
@@ -125,10 +130,13 @@ class PDF_Extractor():
             pages_text.append(text)
         return pages_text
 
-    def extract_pages_text_tables_priority(self,pdf_path,break_at=0):
+    def extract_pages_text_tables_priority(self,pdf_path,break_at=0,verbose=False):
+        ## BUG (Feb 28, 2024) Minion Pro and Roboto fonts may not be supported and replace with no character?! (See TD)
+
         ## pypdf2 works default for tables
         # pdfminer, pdfplumber miss BOA
         #- break_at for pdf image check
+        #> from PyPDF2 import PdfReader   #BOA tables
         read_pdf=False
         try:
             reader = PdfReader(pdf_path)
@@ -143,6 +151,8 @@ class PDF_Extractor():
             #number_of_pages = len(reader.pages)
             for page in reader.pages:
                 text = page.extract_text()
+                if verbose:
+                    print ("[pdf_extractor raw] : "+str(text))
                 text = text.encode('utf-8', 'replace').decode('utf-8', 'replace') #0v2#
                 pages_text.append(text)
                 if break_at and len(pages_text)>=break_at:
@@ -330,6 +340,7 @@ def dev_pdfplumber():
 
     return
 
+
 def dev_pdfpages():
 
     from PyPDF2 import PdfReader
@@ -354,6 +365,104 @@ def dev_pdfpages():
 
     return
 
+def local_extract_pdf_page_text(pdf_path,break_at=0):
+    PE=PDF_Extractor()
+    pages_text=PE.extract_pages_text_tables_priority(pdf_path,break_at=break_at)
+    return pages_text
+
+
+def AUDIT_does_pdf_require_advanced_ocr(pdf_path):
+
+    # Check output quality
+
+    print ("[debug] doing full document analysis for OCR text quality...")
+    pages_text=local_extract_pdf_page_text(pdf_path)
+    all_text=' '.join(pages_text)
+    ocr_reliability,recommend_ocr_higher_quality,meta=alg_ocr_quality(all_text)
+    
+    print ("[debug] OCR reliability: "+str(ocr_reliability)+" recommend_ocr_higher_quality: "+str(recommend_ocr_higher_quality))
+
+    meta['ocr_reliability']=ocr_reliability
+    return recommend_ocr_higher_quality,meta
+
+def AUDIT_does_pdf_require_ocr(pdf_path,verbose=True):
+    #def extract_pages_text_tables_priority(self,pdf_path,break_at=0):
+    #*** THIS IS ALL ABOUT THE pdf2txt EXTRACTION  BUT!  can add more here.
+    reasons=[]
+    
+    page_samples=10
+    
+    pages_text=local_extract_pdf_page_text(pdf_path,break_at=page_samples)
+    
+    overall_incidents=0
+    overall_word_count=1
+    
+    all_samples=[]
+    c=0
+    for page in pages_text:
+        c+=1
+#        print ("PAGE: "+str(page))
+        count_incidents,word_count,incident_rate,samples=alg_count_joined_words(page)
+        
+        all_samples.extend(samples)
+
+        if False:
+            print ("INCIDENTS: "+str(count_incidents))
+            print ("RATE: "+str(incident_rate))
+            print ("SAMPLES: "+str(samples))
+            print ("WORDS: "+str(word_count))
+            print ("---")
+
+        overall_incidents+=count_incidents
+        overall_word_count+=word_count
+        
+        ## Per page stats
+        if count_incidents>5:
+            reasons.append("Page "+str(c)+" has "+str(count_incidents)+" incidents")
+            
+    overall_incident_rate=overall_incidents/overall_word_count
+    
+    if overall_incident_rate>0.007: #ie sample TD
+        reasons.append("Overall incident rate is "+str(overall_incident_rate))
+        
+    if overall_incidents>40:
+        reasons.append("Overall incidents is "+str(overall_incidents))
+
+    require_ocr=False
+    if reasons:
+        require_ocr=True
+
+    ## VERBOSE
+    if verbose:
+        for reason in reasons:
+            print ("[REASON]: "+str(reason))
+            
+        # unique samples
+        uniq_samples=list(set(all_samples))
+        print ("[SAMPLES]: "+str(uniq_samples))
+    
+        print ("[FILENAME]: "+str(pdf_path))
+        print ("[OVERALL RATE]: "+str(overall_incident_rate))
+        #print ("[AUDIT pdf2txt REQUIRE OCR?]: "+str(require_ocr)+" page count: "+str(len(pages_text)))
+    print ("[AUDIT pdf2txt REQUIRE OCR?]: "+str(require_ocr)+" incidents: "+str(overall_incidents)+" rate: "+str(overall_incident_rate))
+    return require_ocr,reasons
+
+
+def dev_check_if_ocr_required():
+    # Catches 1 pager
+    ddir='C:/scripts-23/watchtower/CASE_FILES_STORAGE/storage/65cd06669b6ff316a77a1d21_TDlean/org'
+    filename='65cd06669b6ff316a77a1d21_sample_odd_pdf2txt.pdf'
+    
+    # Try entire TD:
+    ddir='C:/scripts-23/watchtower/CASE_FILES_STORAGE/storage/65cd06669b6ff316a77a1d21'
+    filename='65cd06669b6ff316a77a1d21_d0765e38-0724-475e-97fa-e27ffc31f484.pdf'
+    
+    full_path=ddir+"/"+filename
+    AUDIT_does_pdf_require_ocr(full_path)
+
+    return
+
+
 if  __name__=='__main__':
     branches=['dev1']
     branches=['dev_camelot']
@@ -361,6 +470,7 @@ if  __name__=='__main__':
     branches=['dev_pdfplumber']
 
     branches=['dev_pdfpages']
+    branches=['dev_check_if_ocr_required']
 
     for b in branches:
         globals()[b]()

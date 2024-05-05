@@ -18,6 +18,8 @@ from support_gold import local_process_case_remove_first
 from support_gold import local_page2transaction
 from support_gold import local_firstpage2fields
 from support_gold import local_transaction_type_on_subgraph
+from support_gold import local_pdf2doc
+from support_gold import local_is_transaction_credit
 
 from support_gold import url2testcase
 from support_gold import case_id2text
@@ -29,11 +31,14 @@ logging=setup_logging()
 
 
 
-#0v1# JC  Jan 18, 2023  Setup
+#0v2# JC  Mar 15, 2024  Add is_credit test
+#0v1# JC  Jan 18, 2024  Setup
 
 
 
 """
+**these tests are precursor to dynamic auditing
+
     GOLD FUNCTIONAL TESTS
     **see doc on emergent exceptions to closing the loop on functional tests
 
@@ -49,6 +54,22 @@ TEST ARCHITECTURE:
 )
 """
 
+
+## FOLDERS  (keep within repo -- so can do git pull and have all files)
+config_filename=LOCAL_PATH+"../w_settings.ini"
+if not os.path.exists(config_filename):
+    raise Exception("Config file not found: "+str(config_filename))
+
+Config = ConfigParser.ConfigParser()
+Config.read(config_filename)
+BASE_STORAGE_DIR=Config.get('files','base_test_storage_rel_dir')
+
+TARGET_TEST_FOLDER=LOCAL_PATH+BASE_STORAGE_DIR
+#TARGET_TEST_FOLDER=LOCAL_PATH+"../CASE_FILES_STORAGE/tests"
+SINGLE_TEST_FILE_FOLDER=TARGET_TEST_FOLDER+"/single_pdfs"
+
+if not os.path.exists(TARGET_TEST_FOLDER): os.makedirs(TARGET_TEST_FOLDER)
+if not os.path.exists(SINGLE_TEST_FILE_FOLDER): os.makedirs(SINGLE_TEST_FILE_FOLDER)
 
 
 def local_run_alg_on_test_case(tt):
@@ -71,6 +92,10 @@ def local_run_alg_on_test_case(tt):
     #  page2transactions function test
     ######################################
     if tt['alg']=='page2transactions':
+        if 'test_single_path' in tt['meta']:
+            full_path=SINGLE_TEST_FILE_FOLDER+"/"+tt['meta']['test_single_path']
+            tt['meta']['full_path']=full_path
+
         ## Pre-check (again)
         if not 'full_path' in tt['meta']:
             raise Exception("No full_path in test case: "+str(tt))
@@ -81,17 +106,54 @@ def local_run_alg_on_test_case(tt):
         transactions,meta=local_page2transaction(tt['meta']['full_path'],page_number=tt['meta'].get('page_number',1))
         
         ## Evaluate alg results vs expected tests
-        for tr in transactions.get('all_transactions',[]):
+        if transactions:
+            for tr in transactions.get('all_transactions',[]):
+            
+                if tt['TARGET']:
+                    ## AMOUNT target saught:
+                    if 'amount' in tt['TARGET']:
+                        if float(tr.get('transaction_amount',0))==float(tt['TARGET']['amount']): #12.0 sometimes
+                            test_results['targets_found']=True
+                    if 'date' in tt['TARGET']:
+                        if tr.get('transaction_date','')==tt['TARGET']['date']:
+                            test_results['targets_found']=True
+    
+                ## Assume single target amount to NOT find
+                if tt['NOTARGET']:
+                    if float(tr.get('transaction_amount',0))==float(tt['NOTARGET']['amount']):
+                        test_results['notargets_found']=True
+    ######################################
+    #  page2transactions2creditdebit function test
+    ######################################
+    elif tt['alg']=='page2transactions2creditdebit':
+        if 'test_single_path' in tt['meta']:
+            full_path=SINGLE_TEST_FILE_FOLDER+"/"+tt['meta']['test_single_path']
+            tt['meta']['full_path']=full_path
+        ## Pre-check (again)
+        if not 'full_path' in tt['meta']:
+            raise Exception("No full_path in test case: "+str(tt))
         
-            if tt['TARGET']:
-                ## Assume single target amount to find
-                if float(tr.get('transaction_amount',0))==float(tt['TARGET']['amount']): #12.0 sometimes
-                    test_results['targets_found']=True
+        if not os.path.exists(tt['meta']['full_path']):
+            raise Exception("File not found: "+str(tt['meta']['full_path']))
 
-            ## Assume single target amount to NOT find
-            if tt['NOTARGET']:
-                if float(tr.get('transaction_amount',0))==float(tt['NOTARGET']['amount']):
-                    test_results['notargets_found']=True
+        transactions,meta=local_page2transaction(tt['meta']['full_path'],page_number=tt['meta'].get('page_number',1))
+        
+        ## Evaluate alg results vs expected tests
+        c=0
+        for tr in transactions.get('all_transactions',[]):
+            c+=1
+            tr['id']=c
+            is_credit,tcredit,reasons=local_is_transaction_credit(tr)
+            print ("[verbose] credit: "+str(is_credit)+" for : "+str(tr))
+
+            if tt.get('ISDEBIT',''):
+                if tr.get('transaction_amount',0)==tt['ISDEBIT']['amount'] and not is_credit:
+                    test_results['targets_found']=True
+                    print ("** GOOD DEBIT CLASSIFIED: "+str(tr))
+            if tt.get('ISCREDIT',''):
+                if tr.get('transaction_amount',0)==tt['ISCREDIT']['amount'] and is_credit:
+                    test_results['targets_found']=True
+                    print ("** GOOD CREDIT CLASSIFIED: "+str(tr))
 
     ######################################
     #  firstpage2fields
@@ -100,6 +162,8 @@ def local_run_alg_on_test_case(tt):
     elif tt['alg']=='firstpage2fields':
         ## Prepare for run
         page_text=case_id2text(tt['meta']['case_id'],tt['meta']['page'])
+        
+        ## Run alg
         fields_group=local_firstpage2fields(page_text)
         fields=fields_group[0]
         
@@ -151,10 +215,66 @@ def local_run_alg_on_test_case(tt):
         # Validate
         if not found:
             print ("[debug] bad results expect: "+str(tt['ANDTEST_amount_type']))
-            raise Exception("Test failed")
+            raise Exception("Test failed: "+str(tt))
 
+    ######################################
+    #  pdf2txt
+    ######################################
+    #- ie/ TD or various removes spaces in text -- requires OCR or different pdf2txt library
+    elif tt['alg']=='pdf2txt':
+        print ("[debug] pdf2txt: [1]  validate filename exists (or source/sync)")
+        print ("[debug] pdf2txt: [2]  Load default pdf2txt")
+        print ("[debug] pdf2txt: [3]  Run pdf2txt + check output format")
+        print ("[debug] pdf2txt: [4]  **hook auto_audit system HERE for dev/validation [ ] draw this!!!! because good approach to integrated auto-audit and resolver")
+        print ("[debug] pdf2txt: [5]  Evaluate outputs (use audit plugin logic where possible)")
+
+        from m_autoaudit.audit_plugins.audit_plugins_main import alg_count_joined_words
+        from m_autoaudit.audit_plugins.audit_plugins_main import alg_count_comma_period_amounts
+                
+        ## 1
+        full_path=SINGLE_TEST_FILE_FOLDER+"/"+tt['meta']['test_single_path']
+        if not os.path.exists(full_path):
+            raise Exception("File not found: "+str(full_path))
+            
+        ## 2+3  Load pdf2txt wrapper similar to above
+        #- see support_gold and used in case_id2text as well
+        Doc=local_pdf2doc(full_path)
+        epages=Doc.get_epages()
+         
+        # sample page_text grab
+        page_text=''
+        all_pages=[]
+        for page_num in epages:
+            #if not (page_num+1)==page_number: continue
+            for method in epages[page_num]:
+                if not method=='pypdf2_tables': continue
+                print ("METHOD: "+str(method))
+                page_text=epages[page_num][method]
+                all_pages.append(page_text)
+        blob=" ".join(all_pages)
+        
+        ## Audit hook
+        #[ ] count occurrences of bad spaces (see audit_plugins setup)
+        count_joined,count_words,joined_rate,samples=alg_count_joined_words(blob)
+        
+        print ("[debug] count_joined: "+str(count_joined)+", joined_rate: "+str(joined_rate)+' count_words : '+str(count_words))
+        print ("[bad pdf2txt samples] "+str(samples))
+        
+        ## Audit hook 2 for amount
+        count_bad_amounts=alg_count_comma_period_amounts(blob)
+        
+        print ("[debug] pdf2txt bad amounts count: "+str(count_bad_amounts))
+
+        
+        ## Test evaluation
+        #[ ] follow test eval template?
+        #if len(samples)>8: #Better for rate
+        #    raise Exception("Test failed too many conjoined words: "+str(tt))
+        if joined_rate>0.005:
+            raise Exception("Test failed too many conjoined words: "+str(tt))
+        
     else:
-        raise Exception("Unknown alg: "+str(tt['alg']))
+        raise Exception("Unknown alg: "+str(tt['alg'])+" at test: "+str(tt))
             
             
     ## Store results & alert results
@@ -163,14 +283,14 @@ def local_run_alg_on_test_case(tt):
             logging.info("Test passed")
         else:
             logging.info("Test failed (target not found)")
-            raise Exception("Test failed (target not found)")
+            raise Exception("Test failed (target not found) at test: "+str(tt))
     
     if tt['NOTARGET']:
         if not test_results['notargets_found']:
             logging.info("Test passed")
         else:
             logging.info("Test failed -- because no-targets found")
-            raise Exception("Test failed -- because no-targets found!")
+            raise Exception("Test failed -- because no-targets found! at test: "+str(tt))
 
     return test_results
 
@@ -217,13 +337,37 @@ def run_functional_tests():
     return
 
 def run_specific_functional_tests():
+    ##
     name='marners_check_big_deposit'  #gpt-4 could take a while?!
-    name='PJ_opening_balance'
     name='chase_3_page_consolidated'
     name='newage_check_check_not_total'
     name='check withdrawl flagged as deposit'
     name='skyview_checks_included'
-    name='schoolkiz_checks_missing_bad_transaction_count'
+
+    name='schoolkiz_checks_missing_bad_transaction_count' #Feb 28 fail??
+    name='PJ_opening_balance'
+
+    name='boa_wire_transfers_odd'
+
+    name='TD_odd_pdf2txt'
+    name='silent_pipe_200_plus' #Large check ocr
+
+    name='year_end_date_roll'
+    name='james_bad_debit_credit_on_obvious' #<-- page2t ok
+    #2long#  name='james_bad_debit_credit_subgraphmaybe'
+    name='blank_page_continues_chat' #No hallucination if direct call
+    name='hallucinates_123_main_st'  #3.5 -> 4 fixed
+    name='ashford_year_in_advance' #[x] fixed
+    name='bad comma period amount'
+    name='year is not check num' #
+    name='check not debit'   #Fixed on subsequent
+    name='bad ocr normal entry'
+
+    name='affinity date'
+
+    name='reversal deposit'
+
+
     
     tts=load_all_test_cases(name=name)
     for tt in tts:

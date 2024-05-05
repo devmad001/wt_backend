@@ -1,5 +1,5 @@
 import os
-    import sys
+import sys
 import codecs
 import json
 import re

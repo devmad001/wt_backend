@@ -10,10 +10,26 @@ import time
 import base64
 import io
 
+import configparser as ConfigParser
+
 LOCAL_PATH = os.path.abspath(os.path.dirname(__file__))+"/"
 sys.path.insert(0,LOCAL_PATH)
-from key_storage import SqliteDict_Wrap
-from key_storage import NestedDict
+
+Config = ConfigParser.ConfigParser()
+
+S3_BUCKET_NAME = None
+SERVICE_NAME = None
+
+s3_config_file=LOCAL_PATH+"storage_config.ini"
+if os.path.exists(s3_config_file):
+    Config.read(s3_config_file)
+    SERVICE_NAME = Config.get('storage','service_name')
+    S3_BUCKET_NAME=Config.get('storage','s3_bucket_name')
+
+if SERVICE_NAME == "S3":
+    from s3_storage import S3Dict, NestedDict
+else:
+    from key_storage import SqliteDict_Wrap, NestedDict
 
 
 #**add auto refresh
@@ -73,7 +89,10 @@ class Storage_Helper(object):
         return
     
     def init_db(self,name):
-        self.dbs[name]=SqliteDict_Wrap(name=name,storage_dir=self.storage_dir)
+        if SERVICE_NAME == "S3":
+            self.dbs[name]=S3Dict(bucket_name=S3_BUCKET_NAME,name=name,storage_dir=self.storage_dir)
+        else:
+            self.dbs[name]=SqliteDict_Wrap(name=name,storage_dir=self.storage_dir)
         self.default_name=name
         return
     
@@ -88,7 +107,7 @@ class Storage_Helper(object):
         org_dd=self.dbs[name].get_dd(idx)
 
         org_dd[the_key]=the_value
-        org_dd['the_date']=datetime.datetime.now()
+        org_dd['the_date']=str(datetime.datetime.now())
         
         print (" UPDATE> "+str(org_dd))
 
@@ -110,7 +129,7 @@ class Storage_Helper(object):
         if not name in self.dbs: self.init_db(name)
         dd=NestedDict()
         dd[the_key]=the_value
-        dd['the_date']=datetime.datetime.now()
+        dd['the_date']=str(datetime.datetime.now())
         self.dbs[name].set_dd(idx,dd)
         return
     
@@ -124,7 +143,7 @@ class Storage_Helper(object):
         if dd:
             the_date=dd.get('the_date','')
             # datetimee.datetime.now back to date obj
-            the_date=datetime.datetime.strptime(the_date, '%Y-%m-%d %H:%M:%S.%f')
+            # the_date=datetime.datetime.strptime(the_date, '%Y-%m-%d %H:%M:%S.%f')
         return the_date
     
     def db_get(self,idx,the_key,name=''):
@@ -236,21 +255,21 @@ def base64_to_filepointer(base64_str):
     binary_content = base64.b64decode(base64_str)
     return io.BytesIO(binary_content)
 
-def interface_get(id,the_key,name,storage_dir,SH):
-    if not SH:
-        SH=Storage_Helper(storage_dir=storage_dir)
-        SH.init_db(name)
-    return SH.db_get(id,the_key,name=name) #No serial,SH
+def interface_get(id,the_key,name,storage_dir,Storage):
+    if not Storage:
+        Storage=Storage_Helper(storage_dir=storage_dir)
+        Storage.init_db(name)
+    return Storage.db_get(id,the_key,name=name) #No serial,SH
 
-def interface_put(id,the_key,the_value,name,storage_dir,SH):
-    if not SH:
-        SH=Storage_Helper(storage_dir=storage_dir)
-        SH.init_db(name)
-    return SH.db_put(id,the_key,the_value,name=name)#No return unserializable,SH
+def interface_put(id,the_key,the_value,name,storage_dir,Storage):
+    if not Storage:
+        Storage=Storage_Helper(storage_dir=storage_dir)
+        Storage.init_db(name)
+    return Storage.db_put(id,the_key,the_value,name=name)#No return unserializable,SH
 
 def interface_test(*args,**kwargs):
     storage_dir=LOCAL_PATH+"../ystorage_dbs"
-    SH=Storage_Helper(storage_dir=storage_dir)
+    Storage=Storage_Helper(storage_dir=storage_dir)
     return
     
 
@@ -285,7 +304,7 @@ def test_storage():
     #dd['updated']=dd['updated'].to_pydatetime() #pandas to py
 
 #    dd['updated']=dd['updated'].to_pydatetime() #pandas to py
-    dd['updated']=str(dd['updated'].to_pydatetime()) #pandas to py
+    # dd['updated']=str(dd['updated'].to_pydatetime()) #pandas to py
         
     the_value=dd
 
@@ -347,33 +366,33 @@ def migrate_py2_to_py3():
     name='ccms'
     the_key='json'
 
-    SH=Storage_Helper(storage_dir=storage_dir)
-    SH.init_db(name)
+    Storage=Storage_Helper(storage_dir=storage_dir)
+    Storage.init_db(name)
     
     do_continue=False
     c=0
-    for idx in SH.iter_database(name):
+    for idx in Storage.iter_database(name):
         c+=1
         if idx=='edcc150f6f0411ec9f3e2079185ef8c0': do_continue=True
         if not do_continue:continue
         
         if not c%10 or c<100: print ("[debug] migratin 2py3 for: "+str(idx))
 
-        try:dd=SH.db_get(idx,the_key,name=name)
+        try:dd=Storage.db_get(idx,the_key,name=name)
         except Exception as e:
             if 'unsupported pickle' in str(e):  #Already py3
                 continue
             else:
                 print ("[error] stop: "+str(e))
-                dd=SH.db_get(idx,the_key,name=name)
+                dd=Storage.db_get(idx,the_key,name=name)
 
         if not dd: stopp=no_dd
 
         if not dd: stopp=no_dd
         
         ## Transform to serializeable
-        if dd.get('updated',''):
-            dd['updated']=str(dd['updated'].to_pydatetime()) #pandas to py
+        # if dd.get('updated',''):
+        #     dd['updated']=str(dd['updated'].to_pydatetime()) #pandas to py
         
         argumentlist=[idx,the_key,dd,name,storage_dir,'']
         

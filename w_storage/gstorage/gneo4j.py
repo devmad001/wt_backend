@@ -520,11 +520,48 @@ def dev_check_connections():
 #- depends on class so call at end
 Neo=interface_get_neo4j()
 
+def dev_sample_explicit_session_management():
+    ## COMMENTS:
+    #- Explicitn session open will ensure session closed neatly
+    #- Recall, use tx if want to use same session + the custom code
+    
+    global Neo
+    case_id='case_atm_location'
+    stmt="""
+    MATCH (t:Transaction)
+    WHERE t.case_id='"""+str(case_id)+"""'
+    return t
+    """
+    
+    Neo.connect()
+
+    with Neo.open_session() as session:
+        #session.write_transaction(create_and_return_greeting, "Alice", "Bob")
+        #jsonl,df,tx,meta=Neo.run_stmt_to_normalized(stmt)
+        
+        ## DIRECT RUN
+        records=[]
+        for record in session.run(stmt):
+            records.append(record['t'])
+        print ("Size of records session.run: "+str(len(records)))
+            
+        ## Pass session
+        jsonl,df,tx,meta=Neo.run_stmt_to_normalized(stmt,tx=session)
+        print("Size of records passed: "+str(len(jsonl)))
+
+        ## Assume handles session
+        jsonl,df,tx,meta=Neo.run_stmt_to_normalized(stmt)
+        print("Size of records passed: "+str(len(jsonl)))
+    
+    return
+
+
 if __name__=='__main__':
 
     branches=['dev1']
     branches=['dev_try_remote_server']
     branches=['dev_check_connections']
+    branches=['dev_sample_explicit_session_management']
 
     for b in branches:
         globals()[b]()

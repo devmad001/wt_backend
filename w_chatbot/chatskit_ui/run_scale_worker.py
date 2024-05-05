@@ -76,13 +76,13 @@ class Website_Crawler(object):
 class Scale_Worker(object):
     def __init__(self):
         # worker storage for config
-        self.Worker_Storage=Storage_Helper(storage_dir=LOCAL_PATH+"worker_dbs")
+        self.Storage=Storage_Helper(storage_dir=LOCAL_PATH+"worker_dbs")
         
         # data lake storage for data lake
         self.Data_Lake=Data_Lake_Storage()
 
         self.worker_db_name='worker_configs'
-        self.Worker_Storage.init_db(self.worker_db_name)
+        self.Storage.init_db(self.worker_db_name)
         return
     
     def validate_system(self):
@@ -153,17 +153,17 @@ class Scale_Worker(object):
     
     def store_config(self,config):
         # run id? session id?
-        self.Worker_Storage.db_put(config['run_id'],'config',config,name=self.worker_db_name)
+        self.Storage.db_put(config['run_id'],'config',config,name=self.worker_db_name)
         print ("[info] stored config at run_id: "+str(config['run_id']))
         return
     
     def load_config(self,run_id):
-        record=self.Worker_Storage.db_get(run_id,'config',name=self.worker_db_name)
+        record=self.Storage.db_get(run_id,'config',name=self.worker_db_name)
         return record
 
     def iter_configs(self):
-        for idx in self.Worker_Storage.iter_database(self.worker_db_name):
-            record=self.Worker_Storage.db_get(idx,'config',name=self.worker_db_name)
+        for idx in self.Storage.iter_database(self.worker_db_name):
+            record=self.Storage.db_get(idx,'config',name=self.worker_db_name)
             if record:
                 yield record
         return

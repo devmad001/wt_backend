@@ -365,8 +365,8 @@ def handle_create_entity_receiver_sender(case_id='',markedup_records=[]):
             print ("[cypher] result: "+str(rr)) #Non on insert
             raise Exception ("[expect no result on insert]")
         run_time=time.time()-start_time
-        print ("[insert time]: "+str(run_time))
-#D#        time.sleep(1)
+        if run_time>0.08:
+            print ("[insert time]: "+str(run_time))
 
 
 #        print ("CYPHER: "+str(cypher))

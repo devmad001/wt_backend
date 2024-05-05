@@ -39,7 +39,7 @@ def query_get_versions_dict(node_type, node_id, tx='', id_property_name='id', no
 
     versions_metadata = result['versions_metadata']
 
-    print ("[dev] got current versions: "+str(versions_metadata))
+    #print ("[dev] got current versions: "+str(versions_metadata))
 
     if versions_metadata:
         return json.loads(versions_metadata)

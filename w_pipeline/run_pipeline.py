@@ -1,5 +1,8 @@
 import os
 import sys
+sys.stdout.reconfigure(encoding='utf-8') #Global character output for stdout
+
+
 import codecs
 import json
 import re
@@ -41,7 +44,7 @@ RootConfig.read(LOCAL_PATH+"../w_settings.ini")
 THREADS_FOR_LLM_EXTRACTION=int(RootConfig.get('performance','threads_for_llm_extraction')) #0 off, 10 high
     
 
-#0v6# JC  Feb  9, 2024  Add logging hub (db based)
+#0v6# JC  Feb  9, 2024  Add logging hub (db based) [ ] TODO complete
 #0v5# JC  Dec 27, 2023  Include report generation
 #0v4# JC  Dec 19, 2023  Upgrade to multi thread statement-level batching multi_chunks
 #0v3# JC  Sep 20, 2023  Upgrade ptr (multi-statement files etc)
@@ -79,6 +82,8 @@ if THREAD_COUNT:
 else:
     logging=setup_logging()
     logging.warning("[warning] running extractor in single thread mode!")
+    
+THREAD_MAX_RUNTIME=8*60*60  # 4 hours timeline on hogan 65caaffb9b6ff316a779f525
 
 
 def init_mega(case_id=''):
@@ -411,7 +416,9 @@ def run_pipeline(job={}, Agent=None, options={}):
     #- [ ] optionally use cache
     out_fields=['file_pages']
 
+    #########################################
     ## Load pdfs into document object(s)
+    #########################################
     #print ("[ ] force do normalize!  Recall, file pages is across all documents")
     if not all(field in mega['fields'] for field in out_fields):
         out_normalize=do_normalize(mega,run=run,job=job)  #<-- prepare epages etc.
@@ -489,7 +496,7 @@ def run_pipeline(job={}, Agent=None, options={}):
         #- include 1 hour max timeout on waiting for final results
         if THREAD_COUNT:
             print ("[debug] waiting for all threads to complete")
-            max_wait_time=4*60*60    # 2 hour timeout on 4k nodes
+            max_wait_time=4*60*60    # 4 and 2 hour timeout on 4k nodes
             all_results=Multi.wait_for_all_results(max_wait_time=4*60*60,delay=0.5, fail_on_error=True, update_interval=30)
             print ("[debug] all threads complete")
             

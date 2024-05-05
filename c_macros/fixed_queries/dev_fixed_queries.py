@@ -51,8 +51,8 @@ print (" [ ]  TODO:  add latitude + longitude to transaction meta")
 datasets_dir=LOCAL_PATH+"../../w_datasets"
 if not os.path.exists(datasets_dir):
     raise Exception("Missing datasets dir: "+datasets_dir)
-CacheStorage=Storage_Helper(storage_dir=datasets_dir)
-CacheStorage.init_db('cache_transactions')
+Storage=Storage_Helper(storage_dir=datasets_dir)
+Storage.init_db('cache_transactions')
 
 
 ## Local query
@@ -124,7 +124,7 @@ def dev1():
     return
 
 def load_transactions_from_cache(case_id,kind=''):
-    global CacheStorage
+    global Storage
     AGE_EXPIRY=24*60*60 ## 1 day
 
     id=case_id
@@ -133,7 +133,7 @@ def load_transactions_from_cache(case_id,kind=''):
 
     tts={}
     meta={}
-    dd=CacheStorage.db_get(id,'tts',name='cache_transactions')
+    dd=Storage.db_get(id,'tts',name='cache_transactions')
     if dd:
         tts=dd['tts']
         meta['age']=time.time()-dd['the_time']
@@ -147,7 +147,7 @@ def load_transactions_from_cache(case_id,kind=''):
     return tts,meta
 
 def add_transactions_to_cache(case_id,tts,kind=''):
-    global CacheStorage
+    global Storage
 
     ## Prepare record
     #- date
@@ -160,7 +160,7 @@ def add_transactions_to_cache(case_id,tts,kind=''):
     dd['tts']=tts
     dd['the_time']=time.time()
     
-    CacheStorage.db_put(case_id,'tts',dd,name='cache_transactions')
+    Storage.db_put(case_id,'tts',dd,name='cache_transactions')
 
     return
 

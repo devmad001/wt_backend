@@ -95,7 +95,7 @@ async def websocket_endpoint(websocket: WebSocket):
         logging.warning(f"WebSocket connection rejected. Missing case_id: {case_id}")
 
     await manager.connect(websocket, case_id=case_id, session_id=session_id)
-    init_data_message = request_init_data(case_id=case_id,session_id=session_id,usre_id=user_idtarget='default')
+    init_data_message = request_init_data(case_id=case_id,session_id=session_id,usre_id=user_id,target='default')
     await manager.send_message(json.dumps(init_data_message), case_id, session_id)
 
     try:

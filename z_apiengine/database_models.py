@@ -31,17 +31,17 @@ from w_utils import get_base_endpoint
 
         
 
-#0v5# JC Feb 16, 2023  Beware of loading Check with image_bytes (use load_only)
-#0v4# JC Feb  8, 2023  Log entry table + quick clean
-#0v3# JC Jan 30, 2023  Add Check class (check image)
-#0v3# JC Jan 12, 2023  Query by JSON is db dependent -- ideally upgrade to direct fields
+#0v6# JC Mar  1, 2024  Add auto audit results
+#0v5# JC Feb 16, 2024  Beware of loading Check with image_bytes (use load_only)
+#0v4# JC Feb  8, 2024  Log entry table + quick clean
+#0v3# JC Jan 30, 2024  Add Check class (check image)
+#0v3# JC Jan 12, 2024  Query by JSON is db dependent -- ideally upgrade to direct fields
 #0v2# JC Dec  8, 2023  fin_session_id
 #0v1# JC Nov  8, 2023  Setup
 
 
 """
     DATABASE MODELS
-    - see ~/services/dev_services.py for sample usage
 """
 
 
@@ -176,8 +176,6 @@ class Button(Base):
     category = Column(String(100),nullable=True)  # For grouping buttons into categories
     bmeta = Column(JSON, default=lambda: {})  # Default empty dictionary
 
-#    user = relationship('User', back_populates='buttons')
-
 
 
 class User(Base):
@@ -189,8 +187,6 @@ class User(Base):
     created = Column(DateTime, default=datetime.utcnow)
     # other user fields like email, hashed_password etc.
     umeta = Column(JSON, default=lambda: {})  # Default empty dictionary
-
-#    buttons = relationship('Button', back_populates='user')
 
     def __repr__(self):
         return f"User(username='{self.username}')"
@@ -234,9 +230,6 @@ class FinSession(Base):
 
 #    def __repr__(self):
 #        return f"<AuthSession(user_id='{self.user_id}', session_id='{self.session_id}', created_at='{self.created_at}')>"
-
-## Prepopulate?
-#User.buttons = relationship('Button', order_by=Button.id, back_populates='user')
 
 
 
@@ -332,13 +325,41 @@ class LogEntryModel(Base):
     meta = Column(JSON)  # Flexible JSON field for additional data
 
 
+class AutoAudit(Base):
+    """
+        (sqlalchemy definition for audit record)
+                fields=['id','case_id','route','case_state','scope','incidents','report','the_date','incident_types']
+        
+    """
+    __tablename__ = 'auto_audit'
+    __table_args__ = (
+        Index('idx_auto_audit_case_id', 'case_id'),  # Example index on 'case_id'
+        {'extend_existing': True}
+    )
+
+    id = Column(String(64), primary_key=True)
+    case_id = Column(String(64), nullable=False)
+    the_date = Column(DateTime, default=datetime.utcnow)
+
+    route = Column(Text, nullable=True)  #Could be LONG!
+    
+    scopes = Column(String(255), nullable=True)   #scopes is high-level area of audit
+    runtime=Column(BigInteger, default=0)
+
+    state =  Column(JSON, default=lambda: {})
+    incidents = Column(JSON, default=lambda: [])
+    report = Column(JSON, default=lambda: {})
+    incident_types = Column(JSON, default=lambda: {})
+
+    results= Column(String(255), nullable=True)
+    suggested_actions= Column(String(255), nullable=True)
+
+
 
 def ADMIN_queries():
     
-    
     b=['remove_partial_table_log']
     b=[]
-
 
     ## MANUAL MIGRATION
     if 'migrate add String(25) at Case.state for easy query' in b:
@@ -351,8 +372,9 @@ def ADMIN_queries():
     if 'remove_partial_table_log' in b:
         raise Exception('Manual migration')
         print('remove_partial_table_log')
+
         with engine.connect() as con:
-            con.execute(text("DROP TABLE log_entries")) 
+            con.execute(text("DROP TABLE auto_audit"))
             
     return
 

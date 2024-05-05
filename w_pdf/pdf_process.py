@@ -14,10 +14,12 @@ from w_storage.ystorage.ystorage_handler import Storage_Helper
 
 
 from pdf_extractor import PDF_Extractor
+from azure_ocr.azure_ocr import DocumentIntelligence
 
 logging=setup_logging()
 
 
+#0v4# JC  Mar 18, 2024  Add azure document intelligence for pdf2txt (via ocr)
 #0v3# JC  Oct 13, 2023  Log error but don't fail if given pdf exists without conversion
 #0v2# JC  Sep 19, 2023  Support for multiple pdf2txt methods!
 #0v1# JC  Sep  2, 2023  Init
@@ -192,6 +194,7 @@ def interface_is_image_pdf(filename):
 def do_pdf2txt(filename='',extract_methods=[]):
     local_count_pages=0
     logging.info("[info] do_pdf2txt: "+str(filename))
+    extract_methods=['pypdf2_tables','pdfminer','azure_ocr']
     extract_methods=['pypdf2_tables','pdfminer']
 
     if not filename:
@@ -243,12 +246,27 @@ def do_pdf2txt(filename='',extract_methods=[]):
     
             Doc.set_extracted_pages(pages_of_text,'pdfminer')
 
+    if 'azure_ocr' in extract_methods:
+        raise Exception("Not implemented")
+        pages_of_text=local_pdf2azure_ocr2txt(filename)
+        #** OVERWRITE!!
+        Doc.set_extracted_pages(pages_of_text,'pypdf2_tables')
+        #Doc.set_extracted_pages(pages_of_text,'azure_ocr')
 
 #    local_review_pdf2text_quality(Doc)
     logging.info("[pdf_process.py]  DONE FILENAME: "+str(filename))
-    logging.info("[pages found]: "+str(local_count_pages))
+    logging.info("[pages found]^: "+str(local_count_pages))
 
     return Doc
+
+def local_pdf2azure_ocr2txt(filename):
+    #Mar 18, 2024
+    
+    ## Reconnect for each file
+    DI=DocumentIntelligence()
+    pages_meta=DI.doc2txt(filename)
+    pages_of_text=[item[0] for item in pages_meta]
+    return pages_of_text
 
 def local_review_pdf2text_quality(Doc):
     ## 

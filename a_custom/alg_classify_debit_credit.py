@@ -156,6 +156,7 @@ def resolve_debit_credit_main_account_v2(tt,verbose=False):
 
 
 def local_cypher_transactions(case_id=''):
+    global Neo
     #** via z_apiengine/services/timeline_service
 
     stmt="""

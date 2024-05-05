@@ -37,8 +37,8 @@ logging=setup_logging()
 datasets_dir=LOCAL_PATH+"../../w_datasets"
 if not os.path.exists(datasets_dir):
     raise Exception("Missing datasets dir: "+datasets_dir)
-CacheStorage=Storage_Helper(storage_dir=datasets_dir)
-CacheStorage.init_db('cache_transactions')
+Storage=Storage_Helper(storage_dir=datasets_dir)
+Storage.init_db('cache_transactions')
 
 
 
@@ -51,7 +51,7 @@ def local_query2jsonl(stmt):
 
 
 def load_response_from_cache(case_id,kind='',expires=24*60*60):
-    global CacheStorage
+    global Storage
 
     id=case_id
     if kind:
@@ -61,7 +61,7 @@ def load_response_from_cache(case_id,kind='',expires=24*60*60):
 
     tts={}
     meta={}
-    dd=CacheStorage.db_get(id,'tts',name='cache_transactions')
+    dd=Storage.db_get(id,'tts',name='cache_transactions')
     if dd:
         tts=dd['tts']
         meta['age']=time.time()-dd['the_time']
@@ -76,7 +76,7 @@ def load_response_from_cache(case_id,kind='',expires=24*60*60):
     return tts,meta
 
 def add_response_to_cache(case_id,tts,kind=''):
-    global CacheStorage
+    global Storage
     
     if kind:
         id=case_id+kind
@@ -94,7 +94,7 @@ def add_response_to_cache(case_id,tts,kind=''):
     dd['tts']=tts
     dd['the_time']=time.time()
     
-    CacheStorage.db_put(id,'tts',dd,name='cache_transactions')
+    Storage.db_put(id,'tts',dd,name='cache_transactions')
     
 
     return

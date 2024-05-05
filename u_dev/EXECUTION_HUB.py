@@ -40,7 +40,7 @@ logging=setup_logging()
 
 
 def EXECUTE_KNOWN_CASE(case_id,top_options={}):
-    print ("[execute_case] case_id: %s" % case_id)]")
+#    print ("[execute_case] case_id: %s" % case_id)]")
     print ("> assume have resources")
     print ("> assume job is being tracked in job queue")
     print (">     ^so will resolve or retry any failures")

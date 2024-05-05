@@ -42,6 +42,7 @@ Storage=Storage_Helper(storage_dir=LOCAL_PATH+"../w_datasets")
 Storage.init_db('kb_ask')
 
 
+#0v9# JC  Mar  8, 2024  If cypher response is none ensure set to empty str
 #0v8# JC  Jan 30, 2024  gpt-4 fix bad cypher:  cypher=re.sub(r'\|:','|',cypher)
 #0v7# JC  Jan 15, 2024  Smartest LLM (gpt-4) requires template kind (bank/cypher/etc)
 #0v6# JC  Nov 13, 2023  Do question similarity lookup on multiple attempt
@@ -503,6 +504,15 @@ class KB_AI_Agent:
             cypher = self.LLMSMART.prompt(llm_query,template_kind='cypher',verbose=True)
         else:
             cypher = self.LLM.prompt(llm_query)
+        
+        ## Audit or catch bad response due to over-quota?
+        # if not str or bytes?
+        if not isinstance(cypher, str):
+            if cypher=={} or not cypher:
+                cypher=''
+                logging.warning("LLM response for cypher is blank!")
+            else:
+                logging.error("[bad response on make query]: (will fail regex below) \n"+str(cypher))
             
         ## CLEAN cypher
         cypher=self._clean_cypher(cypher)
@@ -517,10 +527,14 @@ class KB_AI_Agent:
         #{
         #  "query": "MATCH (Transaction:Transaction {case_id: 'case_atm_location'})-[:CREDIT_TO]->(Entity:Entity {type: 'cash'}) RETURN sum(Transaction.transaction_amount) as total_cash_transactions"
         #}
+        
+        ## Patch under what condition?
         try:
             cypher_oops_dict=json.loads(cypher)
             cypher=cypher_oops_dict[list(cypher_oops_dict.keys())[0]]
         except: pass
+
+        if cypher=={} or not cypher: cypher=''
         
         ## LLM (gpt-4) was writing :
         # 0ea5bc2'})-[r:DEBIT_FROM|:CREDIT_TO]->(Entity:En
@@ -891,8 +905,8 @@ def dev_route_question():
 
 if __name__=='__main__':
     branches=['dev_result_data_to_response']
-    branches=['call_kb_agent']
     branches=['dev_route_question']
+    branches=['call_kb_agent']
 
     for b in branches:
         globals()[b]()

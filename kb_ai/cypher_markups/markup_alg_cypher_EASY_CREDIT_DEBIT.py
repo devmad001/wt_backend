@@ -25,6 +25,7 @@ logging=setup_logging()
 from schemas.SCHEMA_kbai import gold_schema_definition
 
 
+#0v2# JC  Mar 15, 2024  [ ] need to upgrade classifier!!
 #0v1# JC  Oct 31, 2023  Front-level debit/credit classifier
 
 """
@@ -32,6 +33,7 @@ from schemas.SCHEMA_kbai import gold_schema_definition
     - seems easy but a bit fuzzy to condense to 1 account
     - also affects a lot of downstream graphs so better to be formal
 """
+print ("[] todo markup_alg_cypher_EASY_CREDIT_DEBIT [ ] need to upgrade credit classifier!!")
 
 
 def do_cypher_markup_EASY_DEBIT_CREDIT(*args,**vars):
@@ -81,122 +83,148 @@ def do_cypher_markup_EASY_DEBIT_CREDIT(*args,**vars):
 
 
 def is_transaction_credit(tt,tcredit={},verbose=False):
+    ## [ ] beware: quite a few assumptions for such an important indicator
+    #[ ] add classifier (SVM) or LLM or extended
+    #[ ] update amount_sign if looks incorrect (since based off simple are there negative transactions)
+    
+    #-> expose at support_Gold.py for functional test
+
     reasons=[]
     transaction_id=tt['id']
+    prob=0
 
-    if True:
-     
-        ## Extra checks  (or move)
-        #[ ] don't modify if already decided?
-        ## Easy logic 0
-        # Check sign of amount (does not happen for every statement but if it's negative then assume debit from main [ ] optional catch)
-        if tt['transaction_amount']<0:
-            tcredit[transaction_id]=False
-            reasons+=['False: transaction_amount<0']
-
-        
-        ## Easy logic 2
-        #- transaction_type -> see schema
-        #"transaction_type": ["withdrawal", "deposit", "loan_disbursement", "loan_repayment", "transfer", "reversal", "refund", "fee", "interest_received", "interest_paid", "other"],
-        #if not transaction_id in tcredit:
-        
-        #####
-        # SPECIAL CASES:
-        #- is transfer a credit?  Depends so don't look at transaction_type
-        #
+    #################################
+    ## Easy logic 0
+    # Check sign of amount (does not happen for every statement but if it's negative then assume debit from main [ ] optional catch)
+    if tt['transaction_amount']<0:
+        tcredit[transaction_id]=False
+        reasons+=['False: transaction_amount<0']
+        prob=90
+    
+    ## Easy logic 2
+    #- transaction_type -> see schema
+    #"transaction_type": ["withdrawal", "deposit", "loan_disbursement", "loan_repayment", "transfer", "reversal", "refund", "fee", "interest_received", "interest_paid", "other"],
+    #if not transaction_id in tcredit:
+    
+    #################################
+    # SPECIAL CASES:
+    #- is transfer a credit?  Depends so don't look at transaction_type
+    if prob<90:
         unused_transaction_types=['transfer'] #ambiguous
-        #####
-        if True:
-            org_class=tcredit.get(transaction_id,None)
-            ## Load schema from SCHEMA_kbai-> transaction_type
-            if tt.get('transaction_type','unknown') in ['deposit','loan_disbursement','refund','interest_received']:
-                tcredit[transaction_id]=True
-                reasons+=['True: transaction_type: '+str(tt['transaction_type'])]
-            elif tt.get('transaction_type','unknown') in ['purchase','payment','withdrawal','loan_repayment','reversal','fee','interest_paid']:
-                tcredit[transaction_id]=False
-                reasons+=['False: transaction_type: '+str(tt['transaction_type'])]
-            else:
-                pass
-                #print ("WHAT? "+str(tt['transaction_type']))
-                #a=okk
-            if not org_class is None and not tcredit[transaction_id]==org_class:
-                logging.warning("[Account relation different then transaction type direction]: "+str(reasons)+" ORG: "+str(org_class)+" new: "+str(tcredit[transaction_id]))
-                
-        ## Easy logic 3
-        #> keywords (like alg)
-        #> overwrite even if already set well above
-        #[ ] may need to refine CREDIT_TO/DEBIT_FROM logic or transaction_type logic.
-        #- for now, hardcode most obvious ones.
-        #[ ] add more from alg?
+        org_class=tcredit.get(transaction_id,None)
+        ## Load schema from SCHEMA_kbai-> transaction_type
+        if tt.get('transaction_type','unknown') in ['deposit','loan_disbursement','refund','interest_received']:
+            tcredit[transaction_id]=True
+            reasons+=['True: transaction_type: '+str(tt['transaction_type'])]
+            prob=91
+        elif tt.get('transaction_type','unknown') in ['purchase','payment','withdrawal','loan_repayment','reversal','fee','interest_paid']:
+            tcredit[transaction_id]=False
+            reasons+=['False: transaction_type: '+str(tt['transaction_type'])]
+            prob=91
+        else:
+            pass
+            #print ("WHAT? "+str(tt['transaction_type']))
+            #a=okk
+        if not org_class is None and not tcredit[transaction_id]==org_class:
+            logging.warning("[Account relation different then transaction type direction]: "+str(reasons)+" ORG: "+str(org_class)+" new: "+str(tcredit[transaction_id]))
+
+    #################################
+    ## SECTION LOGIC
+    if prob<90:
+        section=tt.get('section','')
+        if re.search(r'withdraw',section,flags=re.I) or re.search(r'subtraction',section,flags=re.I) or re.search(r'purchase',section,flags=re.I):
+            tcredit[transaction_id]=False
+            reasons+=['False section withdrawl']
+            prob=92
+        elif re.search(r'deposit',section,flags=re.I) or re.search(r'addition',section,flags=re.I): 
+            tcredit[transaction_id]=True
+            reasons+=['True section deposit']
+            prob=92
+        elif re.search(r'\bpaid\b',section,flags=re.I): 
+            tcredit[transaction_id]=False
+            reasons+=['False section paid']
+            prob=92
+        
+    #################################
+    ## Easy logic 4
+    #> keywords (like alg)
+    #> overwrite even if already set well above
+    #[ ] may need to refine CREDIT_TO/DEBIT_FROM logic or transaction_type logic.
+    #- for now, hardcode most obvious ones.
+    #[ ] add more from alg?
+    if prob<80: #essentially if not already set look into description
         if re.search(r'reversal',tt['transaction_description'],flags=re.I):
             tcredit[transaction_id]=True
             reasons+=['True: deposit']
-
+            prob=85
+    
         if re.search(r'deposit',tt['transaction_description'],flags=re.I):
             tcredit[transaction_id]=True
             reasons+=['True: deposit']
-
+            prob=85
+    
         if re.search(r'refund',tt['transaction_description'],flags=re.I): 
             tcredit[transaction_id]=True
             reasons+=['True: refund']
-
+            prob=85
+    
         if re.search(r'withdraw',tt['transaction_description'],flags=re.I): 
             tcredit[transaction_id]=False
             reasons+=['False withdraw']
-
+            prob=85
+    
         if re.search(r'\bpaid\b',tt['transaction_description'],flags=re.I): 
             tcredit[transaction_id]=False
             reasons+=['False paid']
-
-        ## SECTION LOGIC
-        section=tt.get('section','')
-        if re.search(r'\bpaid\b',section,flags=re.I): 
-            tcredit[transaction_id]=False
-            reasons+=['False section paid']
-        if re.search(r'withdraw',section,flags=re.I): 
-            tcredit[transaction_id]=False
-            reasons+=['False section withdrawl']
-        if re.search(r'deposit',section,flags=re.I): 
-            tcredit[transaction_id]=True
-            reasons+=['True section deposit']
-
-        ## logic 4 (so less common ie/ could not classify per above so through error + custom patch)
-        if not transaction_id in tcredit:
-            if re.search(r'\bcheck\b',tt.get('transaction_method',''),flags=re.I):  #Check would be out
-                tcredit[transaction_id]=False
-                reasons+=['False check']
-                
-        ## LOGIC 5
-        #> hard logic
-        
-        ## Transfers can be ambiguous within main account credit/debit but if must:
-        # 'Online Transfer To Chk' is_credit=False
-        if 'Online Transfer To Chk' in str(tt):
-            tcredit[transaction_id]=False
-            reasons+=['False: Online Transfer To Chk']
+            prob=85
             
-        ## Logic:  If orignal statement is SIGNED then hard enforce as plus or minus
-        #[ ] add logic check if above not matches org
-        if tt.get('amount_sign','')=='-': #Negative
+    #################################
+    # Transaction method: (if not set)
+    ## logic 4 (so less common ie/ could not classify per above so through error + custom patch)
+    if prob<80:
+        if re.search(r'\bcheck\b',tt.get('transaction_method',''),flags=re.I):  #Check would be out
             tcredit[transaction_id]=False
-        elif tt.get('amount_sign','')=='+': #Pos
+            reasons+=['False check']
+            prob=85
+        
+    #################################
+    ## LOGIC 5
+    #> hard logic searches
+    #b) ? if 'Online Transfer' in str(tt):
+    
+    ## Transfers can be ambiguous within main account credit/debit but if must:
+    # 'Online Transfer To Chk' is_credit=False
+    if 'Online Transfer To Chk' in str(tt):
+        tcredit[transaction_id]=False
+        reasons+=['False: Online Transfer To Chk']
+        prob=88
+        
+    #################################
+    ## Logic:  If orignal statement is SIGNED then hard enforce as plus or minus
+    #[ ] add logic check if above not matches org
+    #[ ] March 2024 beware of assumption single amount_sign not always extracted fully!!
+    if tt.get('amount_sign','')=='-': #Negative
+        tcredit[transaction_id]=False
+        prob=80
+
+    elif tt.get('amount_sign','')=='+': #Pos
+        if prob<50:
             #* only + if signed transactions (ie/ there exists some -, so should not be false)
             if tcredit.get(transaction_id,None) is False:
                 logging.warning("[Signed transaction but classified as debit]: "+str(reasons))
                 logging.dev("[Signed transaction but classified as debit]: "+str(reasons))
-            tcredit[transaction_id]=True
 
-                
-        ## FINAL DEBUG OPTION
-        if False:
-            if 'Online Transfer' in str(tt):
-                print ("AT: "+str(tt))
-                print ("REASONS: "+str(reasons))
-                a=okkk
-                
-        if verbose:
-            print ("[desc]: "+str(tt['transaction_description'])+" is_credit: "+str(tcredit.get(transaction_id,None))+" reasons: "+str(reasons))
+            tcredit[transaction_id]=True
+            prob=60
+    else:
+        pass  # Upper logic not sure on sign
+
+    #[ ] auto change sign if not set and things credit/debit
+
             
+    if verbose:
+        print ("[desc]: "+str(tt['transaction_description'])+" is_credit: "+str(tcredit.get(transaction_id,None))+" reasons: "+str(reasons))
+        
    
     is_credit=None
     if not transaction_id in tcredit:

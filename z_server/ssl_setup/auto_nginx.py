@@ -1,4 +1,4 @@
-
+"""
     def setup_new_server_libs(self,branch=''):
         cmds,apts,pips=self.get_std_cmds()
         
@@ -47,4 +47,4 @@
         pips+=['flask flask-cors']
         
         return cmds,apts,pips
-
+"""

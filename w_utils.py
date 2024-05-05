@@ -12,12 +12,58 @@ sys.path.insert(0,LOCAL_PATH)
 sys.path.insert(0,LOCAL_PATH+"../")
 
 
+Config = ConfigParser.ConfigParser()
+Config.read(LOCAL_PATH+"w_settings.ini")
+SUBDOMAIN=Config.get('services','fraudapi_subdomain') #core
+DOMAIN=Config.get('services','fraudapi_domain') #epventures.co
 
+
+#0v2# JC  Mar 28, 2024  Get subdomain from config file
 #0v1# JC  Sep 26, 2023  Init
+
 
 """
     COMMON UTILITIES
+    
+    LockedDict:  To enforce read-only dictionary (like a class but simpler)
 """
+
+class LockedDict(dict):
+    def __init__(self, *args, **kwargs):
+        self._is_locked = True
+        super().__init__(*args, **kwargs)
+
+    def unlock(self):
+        self._is_locked = False
+
+    def lock(self):
+        self._is_locked = True
+
+    def _ensure_unlocked(func):
+        def wrapper(self, *args, **kwargs):
+            if self._is_locked:
+                raise ValueError("The dictionary is locked and cannot be edited. Use the unlock() method to enable edits.")
+            return func(self, *args, **kwargs)
+        return wrapper
+
+    @_ensure_unlocked
+    def __setitem__(self, key, value):
+        super(LockedDict, self).__setitem__(key, value)
+
+    @_ensure_unlocked
+    def __delitem__(self, key):
+        super(LockedDict, self).__delitem__(key)
+
+    @_ensure_unlocked
+    def update(self, *args, **kwargs):
+        super(LockedDict, self).update(*args, **kwargs)
+
+    @_ensure_unlocked
+    def clear(self):
+        super(LockedDict, self).clear()
+        
+    def dump(self):
+        return json.dumps(self) 
 
 
 def levenshtein(s1, s2):
@@ -85,8 +131,10 @@ def am_i_on_server():
         return True
     
 def get_base_endpoint():
+    global SUBDOMAIN, DOMAIN
     if am_i_on_server():
-        base_domain='https://core.epventures.co'
+        #base_domain='https://coredemo1.epventures.co'
+        base_domain='https://' + SUBDOMAIN + '.' + DOMAIN
     else:
         base_domain='http://127.0.0.1:8008'
     return base_domain

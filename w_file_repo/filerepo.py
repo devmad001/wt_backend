@@ -308,6 +308,7 @@ def dev1():
 
     case_id='case_dev'
     full_filename='C:/scripts-23/watchtower/Watchtower Solutions AI/Bank Statements - for Beta Testing/SGM BOA statement december 2021.pdf'
+    # full_filename='C:/WatchtowerGroup/docs/queues 0v1.pdf'
     filename=re.sub(r'.*[\\\/]','',full_filename)
 
     kkey=case_id+"-"+filename
@@ -327,17 +328,6 @@ def dev1():
 
     ## WRITE PAGES?
     ## WRITE TEXT?
-
-    return
-
-
-def dev_try_large_pdf_to_stored_pages():
-    #700+ pages may not load correctly??
-    filename='__________________________________________________________e_manager/storage/chase_2_barcenas/Chase Statements 2.pdf'
-    case_id='chase_2_barcenas'
-
-    FS=File_Storage()
-    FS.full_process_pdf(filename,case_id=case_id)
 
     return
 
@@ -392,10 +382,42 @@ def dev_url_encode_words():
 
     return
 
+
+def dev_try_various_pdf_storage():
+
+
+    if True or 'dod1':
+        filename=LOCAL_PATH+"../../CASE_FILES_STORAGE/storage/660446437a047045e56b7970/217cab58-afd7-4f8c-8f99-9ca191a1e306.pdf"
+        case_id='660446437a047045e56b7970'
+    if True or 'colin' in []:
+        filename=LOCAL_PATH+"../../CASE_FILES_STORAGE/storage/ColinFCB1/Management-Properties-v-Brusko-Copy-of-First-Citizens-Bank-Checks-2020.pdf"
+        case_id='ColinFCB1'
+
+    if 'Rich patch' in []:
+        filename=LOCAL_PATH+"../../CASE_FILES_STORAGE/storage/65f9a28a7a047045e56b4df1/daa9e835-2572-48a0-833e-df03a8fbd5e6.pdf"
+        case_id='65f9a28a7a047045e56b4df1'
+
+    if 'try redo new age new process' in []:
+        pass
+        #[ ] use config
+        filename=LOCAL_PATH+"../../CASE_FILES_STORAGE/storage/65960931c8fca0cb7b70e024/eda6493a-3b12-4884-a4b7-d9a29d8e83c1.pdf"
+        case_id='65960931c8fca0cb7b70e024'
+
+    if 'very large 700 pager' in []:
+        #700+ pages may not load correctly??
+        filename='__________________________________________________________e_manager/storage/chase_2_barcenas/Chase Statements 2.pdf'
+        case_id='chase_2_barcenas'
+
+    FS=File_Storage()
+    FS.full_process_pdf(filename,case_id=case_id)
+
+    return
+
+
 if __name__=='__main__':
     branches=['dev1']
-    branches=['dev_try_large_pdf_to_stored_pages']
     branches=['dev_url_encode_words']
+    branches=['dev_try_various_pdf_storage']
 
     for b in branches:
         globals()[b]()
